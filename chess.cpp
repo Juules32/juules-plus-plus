@@ -87,8 +87,6 @@ map<char, int> promoted_pieces = {
 U64 bitboards[12];
 const int size_of_bitboards = sizeof(bitboards);
 
-
-
 // occupancy bitboards
 U64 occupancies[3];
 const int size_of_occupancies = sizeof(occupancies);
