@@ -1,5 +1,5 @@
 #include <iostream>
-#include "bitboards.h"
+#include "board.h"
 
 using namespace std;
 

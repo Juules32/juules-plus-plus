@@ -5,7 +5,7 @@ using namespace std;
 
 #include "shorthands.h"
 #include "rng.h"
-#include "bitboards.h"
+#include "board.h"
 #include "move_generation.h"
 #include "perft.h"
 #include "uci.h"

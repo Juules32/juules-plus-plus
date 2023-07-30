@@ -1,5 +1,5 @@
 #pragma once
-#include "bitboards.h"
+#include "board.h"
 
 // Amount of reached nodes
 extern long nodes;

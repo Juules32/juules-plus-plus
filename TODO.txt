@@ -1,6 +1,4 @@
+
+Lav klasser til rng, perft, uci, board, og til sidst move_generation
+
 Brug c++ strings med bl.a. .find() til at parse UCI commands
-
-Sorter kode i forskellige .h og .cpp filer
-
-
-Note: "extern" keyword in .h files is used to only declare, but not define variables
