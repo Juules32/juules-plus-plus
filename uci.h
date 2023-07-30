@@ -1,3 +1,5 @@
 #pragma once
 
-int parse_move(char[]);
+namespace uci {
+    int parse_move(char[]);
+}

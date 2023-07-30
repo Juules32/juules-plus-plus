@@ -11,7 +11,6 @@ using namespace std;
 #define set_bit(bitboard, square) (bitboard |= (1ULL << square))
 #define pop_bit(bitboard, square) (is_occupied(bitboard, square) ? bitboard ^= (1ULL << square) : 0)
 
-
 // Names for white, black, rook and bishop
 enum {white, black, both};
 enum {rook, bishop};

@@ -3,9 +3,9 @@
 #include <string.h>
 #include <iostream>
 
-long nodes;
+long perft::nodes = 0;
 
-void perft_test(int depth)
+void perft::test(int depth)
 {
     printf("\n     Performance test\n\n");
     
@@ -13,7 +13,7 @@ void perft_test(int depth)
     moves move_list[1];
     
     // Generate moves
-    generate_moves(move_list, bitboards, occupancies, side, castle, en_passant);
+    generate_moves(move_list);
     
     // Init start time
     auto startTime = chrono::high_resolution_clock::now();
@@ -33,7 +33,7 @@ void perft_test(int depth)
         long cummulative_nodes = nodes;
         
         // call perft driver recursively
-        perft_driver(depth - 1);
+        perft::driver(depth - 1);
         
         // old nodes
         long old_nodes = nodes - cummulative_nodes;

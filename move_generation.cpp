@@ -561,7 +561,7 @@ U64 find_magic_number(int square, int relevant_bits, int bishop)
 
     for (int random_count = 0; random_count < 100000000; random_count++)
     {
-        U64 magic_number = sparse_rng_64();
+        U64 magic_number = rng::generate_magic_number_contender();
 
         if (count_bits((attack_mask * magic_number) & 0xFF00000000000000) < 6) continue;
 
@@ -601,4 +601,14 @@ void init_magic_numbers()
     {
         printf(" 0x%llxUll,\n", find_magic_number(square, bishop_relevant_bits[square], bishop));
     }
+}
+
+void print_attacked_squares(int side) {
+    U64 result = 0ULL;
+    for (int square = 0; square < 64; square++)
+    {
+        if(is_square_attacked(square, side)) set_bit(result, square);
+    }
+    
+    board::print_bitboard(result);
 }

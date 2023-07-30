@@ -1,27 +1,24 @@
 #include <iostream>
 #include "board.h"
 
-using namespace std;
 
-// piece bitboards
-U64 bitboards[12];
-const int size_of_bitboards = sizeof(bitboards);
+U64 board::bitboards[12];
 
-// occupancy bitboards
-U64 occupancies[3];
-const int size_of_occupancies = sizeof(occupancies);
+U64 board::occupancies[3];
 
 // side to move
-int side = -1;
+int board::side = -1;
 
 // en_passant square
-int en_passant = no_sq; 
+int board::en_passant = no_sq; 
 
 // castling rights
-int castle;
+int board::castle = 0;
+
+
 
 // Prints a bitboard
-void print_bitboard(U64 bitboard)
+void board::print_bitboard(U64 bitboard)
 {
     int square;
     cout << "\n";
@@ -53,7 +50,7 @@ void print_bitboard(U64 bitboard)
     cout << "     bitboard: " << bitboard << "\n";
 }
 
-void print_game() {
+void board::print_game() {
     int square;
     cout << "\n";
 
@@ -101,7 +98,7 @@ void print_game() {
                                            (castle & bq) ? 'q' : '-');
 }
 
-void parse_fen(char fen[]) {
+void board::parse_fen(char fen[]) {
     memset(bitboards, 0ULL, sizeof(bitboards));
 
     side = 0;

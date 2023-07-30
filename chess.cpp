@@ -14,9 +14,12 @@ int main()
 {
 
     init_moves();
-    parse_fen(tricky_position);
 
-    perft_test(5);    
+    board::parse_fen(start_position);
+
+    perft::test(6);
+
+    getchar(); 
     
     return 0;
 }
