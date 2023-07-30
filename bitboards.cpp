@@ -1,6 +1,6 @@
 #include <iostream>
-#include <string.h>
 #include "bitboards.h"
+
 using namespace std;
 
 // piece bitboards

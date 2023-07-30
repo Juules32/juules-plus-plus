@@ -1,8 +1,6 @@
-
 #pragma once
 #include <map>
 using namespace std;
-
 
 // Defining custom type U64, consisting of 64 zeroes
 #define U64 unsigned long long
@@ -37,3 +35,12 @@ extern const char ascii_pieces[13];
 extern const char *unicode_pieces[12];
 extern map<char, int> char_pieces;
 extern map<char, int> promoted_pieces;
+
+// FEN dedug positions
+extern char empty_board[];
+extern char start_position[];
+extern char pawns_position[];
+extern char tricky_position[];
+extern char killer_position[];
+extern char cmk_position[];
+extern char rook_position[];
