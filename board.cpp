@@ -6,13 +6,13 @@ U64 board::bitboards[12];
 
 U64 board::occupancies[3];
 
-// side to move
+// Side to move
 int board::side = -1;
 
-// en_passant square
+// En_passant square
 int board::en_passant = no_sq; 
 
-// castling rights
+// Castling rights
 int board::castle = 0;
 
 
