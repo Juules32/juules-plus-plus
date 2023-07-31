@@ -1,5 +1,6 @@
 #include "uci.h"
-#include "move_generation.h"
+#include "board.h"
+#include "utils.h"
 
 namespace uci {
     int parse_move(char move_string[])
@@ -10,9 +11,9 @@ namespace uci {
 
         moves move_list[1];
 
-        generate_moves(move_list);
+        board::generate_moves(move_list);
 
-        print_moves(move_list);
+        print::all_moves(move_list);
 
         for (int move_count = 0; move_count < move_list->size; move_count++)
         {

@@ -13,7 +13,7 @@ void perft::test(int depth)
     moves move_list[1];
     
     // Generate moves
-    generate_moves(move_list);
+    board::generate_moves(move_list);
     
     // Init start time
     auto startTime = chrono::high_resolution_clock::now();
@@ -25,7 +25,7 @@ void perft::test(int depth)
         copy_board();
         
         // make move
-        if (!make_move(move_list->array[move_count], false))
+        if (!board::make_move(move_list->array[move_count], false))
             // skip to the next move
             continue;
         
@@ -39,7 +39,7 @@ void perft::test(int depth)
         long old_nodes = nodes - cummulative_nodes;
         
         // take back
-        take_back();
+        revert_board();
         
         // print move
         printf("     move: %s%s%c  nodes: %ld\n", index_to_square[get_source(move_list->array[move_count])],

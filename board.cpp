@@ -17,86 +17,6 @@ int board::castle = 0;
 
 
 
-// Prints a bitboard
-void board::print_bitboard(U64 bitboard)
-{
-    int square;
-    cout << "\n";
-
-    // loop over board ranks
-    for (int rank = 0; rank < 8; rank++)
-    {
-        // loop over board files
-        for (int file = 0; file < 8; file++)
-        {
-            // current square is set
-            square = rank * 8 + file;
-
-            // print ranks
-            if (!file)
-                cout << "  " << 8 - rank << " ";
-
-            // print bit at the current square
-            printf(" %d", get_bit(bitboard, square));
-        }
-
-        cout << "\n";
-    }
-
-    // print files
-    cout << "\n     a b c d e f g h\n\n";
-
-    // print bitboard as decimal number
-    cout << "     bitboard: " << bitboard << "\n";
-}
-
-void board::print_game() {
-    int square;
-    cout << "\n";
-
-    // loop over board ranks
-    for (int rank = 0; rank < 8; rank++)
-    {
-        // loop over board files
-        for (int file = 0; file < 8; file++)
-        {
-            // current square is set
-            square = rank * 8 + file;
-
-            // print ranks
-            if (!file)
-                cout << "  " << 8 - rank << " ";
-
-            int piece = -1;
-            for(int i = 0; i < 12; i++) {
-                if(is_occupied(bitboards[i], square)) {
-                    piece = i;
-                    break;
-                }
-            }
-
-            printf(" %c", piece == -1 ? '.' : ascii_pieces[piece]);
-
-        }
-
-        cout << "\n";
-    }
-
-    // print files
-    cout << "\n     a b c d e f g h\n\n";
-
-    // print side to move
-    printf("     Side:     %s\n", side == white ? "white" : "black");
-    
-    // print en_passant square
-    printf("     en_passant:  %s\n", (en_passant != no_sq) ? index_to_square[en_passant] : "no");
-    
-    // print castling rights
-    printf("     Castling:  %c%c%c%c\n\n", (castle & wk) ? 'K' : '-',
-                                           (castle & wq) ? 'Q' : '-',
-                                           (castle & bk) ? 'k' : '-',
-                                           (castle & bq) ? 'q' : '-');
-}
 
 void board::parse_fen(char fen[]) {
     memset(bitboards, 0ULL, sizeof(bitboards));
@@ -187,3 +107,5 @@ void board::parse_fen(char fen[]) {
 
     update_occupancies();
 }
+
+

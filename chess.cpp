@@ -5,19 +5,19 @@ using namespace std;
 
 #include "shorthands.h"
 #include "rng.h"
-#include "board.h"
-#include "move_generation.h"
+#include "movegen.h"
 #include "perft.h"
 #include "uci.h"
+#include "utils.h"
 
 int main()
 {
 
-    init_moves();
+    movegen::init_moves();
 
-    board::parse_fen(start_position);
+    board::parse_fen(tricky_position);
 
-    perft::test(6);
+    perft::test(5);
 
     getchar(); 
     
