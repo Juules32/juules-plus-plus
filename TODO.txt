@@ -1,4 +1,0 @@
-
-Lav klasser til rng, perft, uci, board, og til sidst move_generation
-
-Brug c++ strings med bl.a. .find() til at parse UCI commands
