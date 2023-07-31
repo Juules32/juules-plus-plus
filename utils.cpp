@@ -1,5 +1,5 @@
 #include "utils.h"
-#include <iostream>
+#include "board.h"
 
 void print::move(int move) {
     cout << "\n     "

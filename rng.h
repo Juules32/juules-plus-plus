@@ -1,5 +1,5 @@
 #pragma once
-#define U64 unsigned long long
+#include "shorthands.h"
 
 /*
     The rng namespace is used for tasks relating to randomness

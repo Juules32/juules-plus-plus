@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include "shorthands.h"
 
 /*
     The uci namespace is used for defining necessary
@@ -7,5 +7,8 @@
 */
 
 namespace uci {
-    int parse_move(std::string move_string);
+    void init();
+    void loop();
+    int parse_move(string move_string);
+    int parse_moves(string input);
 }

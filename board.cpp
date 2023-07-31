@@ -1,6 +1,4 @@
-#include <iostream>
 #include "board.h"
-
 
 U64 board::bitboards[12];
 
@@ -15,7 +13,7 @@ int board::en_passant = no_sq;
 // Castling rights
 int board::castle = 0;
 
-void board::parse_fen(char fen[]) {
+void board::parse_fen(string fen) {
     memset(bitboards, 0ULL, sizeof(bitboards));
 
     side = 0;

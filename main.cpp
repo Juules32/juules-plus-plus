@@ -1,8 +1,3 @@
-
-#include <iostream>
-#include <string.h>
-using namespace std;
-
 #include "shorthands.h"
 #include "rng.h"
 #include "movegen.h"
@@ -12,15 +7,12 @@ using namespace std;
 
 int main()
 {
+    cout << "\nInitializing ChessPlusPlus engine...\n\n";
 
     movegen::init();
-
-    board::parse_fen(tricky_position);
-
-    perft::test(5);
-
+    uci::init();
     
-    getchar(); 
+
     
     return 0;
 }

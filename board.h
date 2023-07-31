@@ -1,5 +1,4 @@
 #pragma once
-#include <string.h>
 #include "shorthands.h"
 #include "movegen.h"
 
@@ -15,12 +14,6 @@
     memcpy(board::bitboards, bitboards_copy, board::size_of_bitboards);       \
     memcpy(board::occupancies, occupancies_copy, board::size_of_occupancies); \
     board::side = side_copy, board::en_passant = en_passant_copy, board::castle = castle_copy;
-
-struct moves
-{
-    int array[256];
-    int size;
-};
 
 /*
     The board namespace contains the board state
@@ -55,7 +48,7 @@ namespace board
     }
 
     // Used to set position from a fen string
-    void parse_fen(char[]);
+    void parse_fen(string);
 
     // Used to update the occupancy bitboards
     static inline void update_occupancies()

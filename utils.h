@@ -1,5 +1,5 @@
 #pragma once
-#include "board.h"
+#include "shorthands.h"
 
 /*
     The print namespace contains useful functions

@@ -1,7 +1,5 @@
 #include "perft.h"
-#include <chrono>
-#include <string.h>
-#include <iostream>
+#include "shorthands.h"
 
 long perft::nodes = 0;
 

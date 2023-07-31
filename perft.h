@@ -1,6 +1,5 @@
 #pragma once
 #include "board.h"
-#include "movegen.h"
 
 /*
     The perft namespace is used for performance testing

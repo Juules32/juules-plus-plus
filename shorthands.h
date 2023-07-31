@@ -1,5 +1,8 @@
 #pragma once
 #include <map>
+#include <string.h>
+#include <iostream>
+#include <chrono>
 using namespace std;
 
 // Defining custom type U64, consisting of 64 zeroes
@@ -37,10 +40,50 @@ extern map<char, int> char_pieces;
 extern map<char, int> promoted_pieces;
 
 // FEN dedug positions
-extern char empty_board[];
-extern char start_position[];
-extern char pawns_position[];
-extern char tricky_position[];
-extern char killer_position[];
-extern char cmk_position[];
-extern char rook_position[];
+extern string empty_board;
+extern string start_position;
+extern string pawns_position;
+extern string tricky_position;
+extern string killer_position;
+extern string cmk_position;
+extern string rook_position;
+
+struct moves
+{
+    int array[256];
+    int size;
+};
+
+// Macros to extract move information
+#define get_source(move) (move & 0x3f)
+#define get_target(move) ((move & 0xfc0) >> 6)
+#define get_piece(move) ((move & 0xf000) >> 12)
+#define get_promotion_piece(move) ((move & 0xf0000) >> 16)
+#define is_capture(move) (move & 0x100000)
+#define is_double_pawn_push(move) (move & 0x200000)
+#define is_en_passant(move) (move & 0x400000)
+#define is_castling(move) (move & 0x800000)
+
+/*
+          binary move bits                               hexidecimal constants
+
+    0000 0000 0000 0000 0011 1111    source square       0x3f
+    0000 0000 0000 1111 1100 0000    target square       0xfc0
+    0000 0000 1111 0000 0000 0000    piece               0xf000
+    0000 1111 0000 0000 0000 0000    promoted piece      0xf0000
+    0001 0000 0000 0000 0000 0000    capture flag        0x100000
+    0010 0000 0000 0000 0000 0000    double push flag    0x200000
+    0100 0000 0000 0000 0000 0000    en passant flag      0x400000
+    1000 0000 0000 0000 0000 0000    castling flag       0x800000
+*/
+
+// Macro to encode move
+#define encode_move(source, target, piece, promoted, capture, double_pawn_push, en_passant, castling) \
+    (source) |                                                                                        \
+        (target << 6) |                                                                               \
+        (piece << 12) |                                                                               \
+        (promoted << 16) |                                                                            \
+        (capture << 20) |                                                                             \
+        (double_pawn_push << 21) |                                                                    \
+        (en_passant << 22) |                                                                          \
+        (castling << 23)
