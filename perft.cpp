@@ -7,6 +7,7 @@ long perft::nodes = 0;
 
 void perft::test(int depth)
 {
+
     printf("\n     Performance test\n\n");
     
     // Create move list instance
@@ -25,7 +26,7 @@ void perft::test(int depth)
         copy_board();
         
         // make move
-        if (!board::make_move(move_list->array[move_count], false))
+        if (!board::make_move(move_list->array[move_count]))
             // skip to the next move
             continue;
         

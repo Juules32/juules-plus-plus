@@ -29,6 +29,7 @@ enum {
     a1, b1, c1, d1, e1, f1, g1, h1, no_sq
 };
 
+// Lookup-tables relating converting from and to number and square name
 extern const char *index_to_square[64];
 extern const char ascii_pieces[13];
 extern const char *unicode_pieces[12];

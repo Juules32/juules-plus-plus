@@ -2,7 +2,6 @@
 
 unsigned int rng::random_state = 1804289383;
 
-
 // Generates a random 32-bit number from the current state
 unsigned int rng::generate_32_bit()
 {

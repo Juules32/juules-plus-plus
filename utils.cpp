@@ -46,36 +46,28 @@ void print::attacked_squares(int side) {
 }
 
 
-// Prints a bitboard
 void print::bitboard(U64 bitboard)
 {
     int square;
     cout << "\n";
 
-    // loop over board ranks
     for (int rank = 0; rank < 8; rank++)
     {
-        // loop over board files
         for (int file = 0; file < 8; file++)
         {
-            // current square is set
             square = rank * 8 + file;
 
-            // print ranks
             if (!file)
                 cout << "  " << 8 - rank << " ";
 
-            // print bit at the current square
             printf(" %d", get_bit(bitboard, square));
         }
 
         cout << "\n";
     }
 
-    // print files
     cout << "\n     a b c d e f g h\n\n";
 
-    // print bitboard as decimal number
     cout << "     bitboard: " << bitboard << "\n";
 }
 
@@ -83,16 +75,12 @@ void print::game() {
     int square;
     cout << "\n";
 
-    // loop over board ranks
     for (int rank = 0; rank < 8; rank++)
     {
-        // loop over board files
         for (int file = 0; file < 8; file++)
         {
-            // current square is set
             square = rank * 8 + file;
 
-            // print ranks
             if (!file)
                 cout << "  " << 8 - rank << " ";
 
@@ -111,16 +99,9 @@ void print::game() {
         cout << "\n";
     }
 
-    // print files
     cout << "\n     a b c d e f g h\n\n";
-
-    // print side to move
     printf("     Side:     %s\n", board::side == white ? "white" : "black");
-    
-    // print en_passant square
     printf("     en_passant:  %s\n", (board::en_passant != no_sq) ? index_to_square[board::en_passant] : "no");
-    
-    // print castling rights
     printf("     Castling:  %c%c%c%c\n\n", (board::castle & wk) ? 'K' : '-',
                                            (board::castle & wq) ? 'Q' : '-',
                                            (board::castle & bk) ? 'k' : '-',

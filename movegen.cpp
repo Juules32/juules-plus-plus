@@ -3,36 +3,10 @@
 #include <iostream>
 #include "string.h"
 
-/*
-                           castling   move     in      in
-                              right update     binary  decimal
-
- king & rooks didn't move:     1111 & 1111  =  1111    15
-
-        white king  moved:     1111 & 1100  =  1100    12
-  white king's rook moved:     1111 & 1110  =  1110    14
- white queen's rook moved:     1111 & 1101  =  1101    13
-
-         black king moved:     1111 & 0011  =  1011    3
-  black king's rook moved:     1111 & 1011  =  1011    11
- black queen's rook moved:     1111 & 0111  =  0111    7
-
-*/
-
 namespace movegen
 {
 
-    // castling rights update constants
-    const int castling_rights[64] = {
-        7, 15, 15, 15, 3, 15, 15, 11,
-        15, 15, 15, 15, 15, 15, 15, 15,
-        15, 15, 15, 15, 15, 15, 15, 15,
-        15, 15, 15, 15, 15, 15, 15, 15,
-        15, 15, 15, 15, 15, 15, 15, 15,
-        15, 15, 15, 15, 15, 15, 15, 15,
-        15, 15, 15, 15, 15, 15, 15, 15,
-        13, 15, 15, 15, 12, 15, 15, 14};
-
+    // Initializing empty attack arrays for the different pieces (pawns is 2d to account for color)
     U64 pawn_attacks[2][64];
     U64 pawn_quiet_moves[2][64];
     U64 knight_attacks[64];
@@ -42,15 +16,7 @@ namespace movegen
     U64 rook_attacks[64][4096];
     U64 bishop_attacks[64][512];
 
-    // The U64 values for bitmaps used to isolate specific files
-    const U64 not_a = 18374403900871474942ULL;
-    const U64 not_ab = 18229723555195321596ULL;
-    const U64 not_h = 9187201950435737471ULL;
-    const U64 not_gh = 4557430888798830399ULL;
-    const U64 rank_2 = 71776119061217280ULL;
-    const U64 rank_7 = 65280ULL;
-
-    // The amount of squares a bishop can move to, excluding the edge of the board, for each square index.
+    // Amount of squares rook/bishop can move to from square index
     const int bishop_relevant_bits[] = {
         6, 5, 5, 5, 5, 5, 5, 6,
         5, 5, 5, 5, 5, 5, 5, 5,
@@ -61,7 +27,6 @@ namespace movegen
         5, 5, 5, 5, 5, 5, 5, 5,
         6, 5, 5, 5, 5, 5, 5, 6};
 
-    // The amount of squares a rook can move to, excluding the edge of the board, for each square index.
     const int rook_relevant_bits[] = {
         12, 11, 11, 11, 11, 11, 11, 12,
         11, 10, 10, 10, 10, 10, 10, 11,
@@ -72,6 +37,7 @@ namespace movegen
         11, 10, 10, 10, 10, 10, 10, 11,
         12, 11, 11, 11, 11, 11, 11, 12};
 
+    // Pre-generated magic numbers for slider move indexing
     const U64 rook_magic_numbers[64] = {
         0x8a80104000800020ULL,
         0x140002000100040ULL,
@@ -138,7 +104,6 @@ namespace movegen
         0x2006104900a0804ULL,
         0x1004081002402ULL};
 
-    // bishop magic numbers
     const U64 bishop_magic_numbers[64] = {
         0x40040844404084ULL,
         0x2004208a004208ULL,
@@ -205,14 +170,51 @@ namespace movegen
         0x8918844842082200ULL,
         0x4010011029020020ULL};
 
-    // Returns a bitboard of pawn attacks depending on side that excludes edge captures across board
+    /*
+                            castling   move     in      in
+                                right update     binary  decimal
+
+    king & rooks didn't move:     1111 & 1111  =  1111    15
+
+            white king  moved:     1111 & 1100  =  1100    12
+    white king's rook moved:     1111 & 1110  =  1110    14
+    white queen's rook moved:     1111 & 1101  =  1101    13
+
+            black king moved:     1111 & 0011  =  1011    3
+    black king's rook moved:     1111 & 1011  =  1011    11
+    black queen's rook moved:     1111 & 0111  =  0111    7
+
+    */
+
+    // Castling rights update constants
+    const int castling_rights[64] = {
+        7, 15, 15, 15, 3, 15, 15, 11,
+        15, 15, 15, 15, 15, 15, 15, 15,
+        15, 15, 15, 15, 15, 15, 15, 15,
+        15, 15, 15, 15, 15, 15, 15, 15,
+        15, 15, 15, 15, 15, 15, 15, 15,
+        15, 15, 15, 15, 15, 15, 15, 15,
+        15, 15, 15, 15, 15, 15, 15, 15,
+        13, 15, 15, 15, 12, 15, 15, 14};
+
+    // The U64 values for bitmaps used to isolate specific files
+    const U64 not_a = 18374403900871474942ULL;
+    const U64 not_ab = 18229723555195321596ULL;
+    const U64 not_h = 9187201950435737471ULL;
+    const U64 not_gh = 4557430888798830399ULL;
+    const U64 rank_2 = 71776119061217280ULL;
+    const U64 rank_7 = 65280ULL;
+
+    // Returns a bitboard of pawn attacks depending on side
     U64 mask_pawn_attacks(bool side, int square)
     {
-
+        // Initializes empty bitboard
         U64 attacks = 0ULL;
+
+        // Pushes a bit to the location of the requested square
         U64 bitboard = 1ULL << square;
 
-        // Remember - white is 0, black is 1
+        //Adds moves depending on color and whether square is on an edge
         if (side == white)
         {
             if (bitboard & not_h)
@@ -231,13 +233,13 @@ namespace movegen
         return attacks;
     }
 
+
     U64 mask_pawn_quiet_moves(bool side, int square)
     {
 
         U64 moves = 0ULL;
         U64 bitboard = 1ULL << square;
 
-        // Remember - white is 0, black is 1
         if (side == white)
         {
             if (bitboard & rank_2)
@@ -256,12 +258,13 @@ namespace movegen
         return moves;
     }
 
-    // Returns a bitboard of knight attacks that excludes moving across the board
+    // Returns a knight attack mask
     U64 mask_knight_attacks(int square)
     {
         U64 attacks = 0ULL;
         U64 bitboard = 1ULL << square;
 
+        //Excludes moves across board
         if ((bitboard >> 6) & not_ab)
             attacks |= bitboard >> 6;
         if ((bitboard >> 10) & not_gh)
@@ -282,7 +285,7 @@ namespace movegen
         return attacks;
     }
 
-    // Returns a bitboard of king attacks that excludes moving across the board
+    // Returns a king attack mask
     U64 mask_king_attacks(int square)
     {
         U64 attacks = 0ULL;
@@ -306,7 +309,7 @@ namespace movegen
         return attacks;
     }
 
-    // Returns a bitboard of bishop attacks by going in each direction until an edge is reached
+    // Returns a bishop attack mask
     U64 mask_bishop_attacks(int square)
     {
         U64 attacks = 0ULL;
@@ -315,6 +318,7 @@ namespace movegen
         tr = square / 8;
         tf = square % 8;
 
+        // Goes in each direction until board edge is found
         for (int r = tr + 1, f = tf + 1; r < 7 && f < 7; r++, f++)
             attacks |= 1ULL << r * 8 + f;
         for (int r = tr + 1, f = tf - 1; r < 7 && f > 0; r++, f--)
@@ -327,7 +331,7 @@ namespace movegen
         return attacks;
     }
 
-    // Returns a bitboard of rook attacks by going in each direction until an edge is reached
+    // Returns a rook attack mask
     U64 mask_rook_attacks(int square)
     {
         U64 attacks = 0ULL;
@@ -336,6 +340,7 @@ namespace movegen
         tr = square / 8;
         tf = square % 8;
 
+        // Goes in each direction until board edge is found
         for (int r = tr + 1; r < 7; r++)
             attacks |= 1ULL << r * 8 + tf;
         for (int r = tr - 1; r > 0; r--)
@@ -348,7 +353,7 @@ namespace movegen
         return attacks;
     }
 
-    // Returns a bitboard of bishop attacks, depending on whether a blocker is found
+    // Returns bishop moves depending on blocker bitboard
     U64 bishop_moves_on_the_fly(int square, U64 blockers)
     {
         U64 attacks = 0ULL;
@@ -356,6 +361,7 @@ namespace movegen
         int tr = square / 8;
         int tf = square % 8;
 
+        // Goes in each direction until blocker or edge is found
         for (int r = tr + 1, f = tf + 1; r < 8 && f < 8; r++, f++)
         {
             attacks |= 1ULL << r * 8 + f;
@@ -384,7 +390,7 @@ namespace movegen
         return attacks;
     }
 
-    // Returns a bitboard of rook attacks, depending on whether a blocker is found
+    // Returns rook moves depending on blocker bitboard
     U64 rook_moves_on_the_fly(int square, U64 blockers)
     {
         U64 attacks = 0ULL;
@@ -392,6 +398,7 @@ namespace movegen
         int tr = square / 8;
         int tf = square % 8;
 
+        // Goes in each direction until blocker or edge is found
         for (int r = tr + 1; r < 8; r++)
         {
             attacks |= 1ULL << r * 8 + tf;
@@ -435,7 +442,7 @@ namespace movegen
         return occupancy;
     }
 
-    // Initializes the different non-sliding piece attacks
+    // Initializes the different leaper moves
     void init_leaper_moves()
     {
         for (int square = 0; square < 64; square++)
@@ -449,6 +456,7 @@ namespace movegen
         }
     }
 
+    // Initializes the different slider moves
     void init_slider_attacks(bool bishop)
     {
         for (int square = 0; square < 64; square++)
@@ -485,7 +493,8 @@ namespace movegen
         }
     }
 
-    void init_moves()
+    // Performs complete setup
+    void init()
     {
         init_leaper_moves();
         init_slider_attacks(bishop);

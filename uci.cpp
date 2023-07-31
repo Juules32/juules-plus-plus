@@ -2,18 +2,18 @@
 #include "board.h"
 #include "utils.h"
 
+
 namespace uci {
-    int parse_move(char move_string[])
+    int parse_move(std::string move_string)
     {
 
-        int source_square = move_string[0] - 'a' + (8 - (move_string[1] - '0')) * 8;
-        int target_square = move_string[2] - 'a' + (8 - (move_string[3] - '0')) * 8;
+        int source_square = move_string.at(0) - 'a' + (8 - (move_string.at(1) - '0')) * 8;
+        int target_square = move_string.at(2) - 'a' + (8 - (move_string.at(3) - '0')) * 8;
 
         moves move_list[1];
 
         board::generate_moves(move_list);
 
-        print::all_moves(move_list);
 
         for (int move_count = 0; move_count < move_list->size; move_count++)
         {
@@ -24,7 +24,7 @@ namespace uci {
                 if (!promotion_piece)
                     return current_move;
 
-                switch (move_string[4])
+                switch (move_string.at(4))
                 {
                 case 'q':
                     if (promotion_piece == Q)

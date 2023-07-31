@@ -2,8 +2,12 @@
 #include "board.h"
 #include "movegen.h"
 
+/*
+    The perft namespace is used for performance testing
+*/
 
 namespace perft {
+
     // Amount of reached nodes
     extern long nodes;
 
@@ -21,19 +25,21 @@ namespace perft {
 
         for (int move_count = 0; move_count < move_list->size; move_count++)
         {
-            //copies board for later retrieval
+            // Copies board for later retrieval
             copy_board();
 
-            //Makes move and skips if illegal
-            if(!board::make_move(move_list->array[move_count], false)) continue;
+            // Makes move and skips if illegal
+            if(!board::make_move(move_list->array[move_count])) continue;
 
-            //recursively calls itself with current position
+            // Recursively calls itself with current position
             driver(depth-1);
 
-            //retrieves the previous position
+            // Retrieves the previous position
             revert_board();
         }
     }
 
+    // Essentially an outer layer of the driver function
+    // to display test information
     void test(int depth);
 }

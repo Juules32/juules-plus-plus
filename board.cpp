@@ -15,16 +15,12 @@ int board::en_passant = no_sq;
 // Castling rights
 int board::castle = 0;
 
-
-
-
 void board::parse_fen(char fen[]) {
     memset(bitboards, 0ULL, sizeof(bitboards));
 
     side = 0;
     en_passant = no_sq;
     castle = 0;
-
 
     int i = 0;
     int square;

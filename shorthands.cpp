@@ -14,7 +14,7 @@ const char *index_to_square[] = {
 // ASCII pieces
 const char ascii_pieces[] = "PNBRQKpnbrqk";
 
-// unicode pieces
+// Unicode pieces (can't be printed to windows console)
 const char *unicode_pieces[12] = {"♙", "♘", "♗", "♖", "♕", "♔", "♟︎", "♞", "♝", "♜", "♛", "♚"};
 
 map<char, int> char_pieces = {

@@ -13,12 +13,13 @@ using namespace std;
 int main()
 {
 
-    movegen::init_moves();
+    movegen::init();
 
     board::parse_fen(tricky_position);
 
     perft::test(5);
 
+    
     getchar(); 
     
     return 0;

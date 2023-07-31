@@ -3,6 +3,7 @@
 #include "shorthands.h"
 #include "movegen.h"
 
+// Macros for copying and reversing the current board state
 #define copy_board()                                                          \
     U64 bitboards_copy[12], occupancies_copy[3];                              \
     int side_copy, en_passant_copy, castle_copy;                              \
@@ -21,34 +22,42 @@ struct moves
     int size;
 };
 
+/*
+    The board namespace contains the board state
+    As well as relevant functions to generate moves or move
+*/
+
 namespace board
 {
 
-    // piece bitboards
+    // Piece bitboards
     extern U64 bitboards[12];
     const int size_of_bitboards = sizeof(bitboards);
 
-    // occupancy bitboards
+    // Occupancy bitboards
     extern U64 occupancies[3];
     const int size_of_occupancies = sizeof(occupancies);
 
-    // side to move
+    // Side to move
     extern int side;
 
-    // en_passant square
+    // En passant square
     extern int en_passant;
 
-    // castling rights
+    // Castling rights
     extern int castle;
 
+    // Used to add a move to a move list
     static inline void add_move(moves *move_list, int move)
     {
         move_list->array[move_list->size] = move;
         ++move_list->size;
     }
 
+    // Used to set position from a fen string
     void parse_fen(char[]);
 
+    // Used to update the occupancy bitboards
     static inline void update_occupancies()
     {
         memset(occupancies, 0ULL, size_of_occupancies);
@@ -67,19 +76,19 @@ namespace board
         occupancies[both] |= occupancies[black];
     }
 
+    // Used to find out if a given square is attacked
     static inline int is_square_attacked(int square, int side)
     {
 
         // The key point is that any piece (with the exception of pawns) can reach the same square it moved from
-
         // A pawn of opposite color should overlap with one of the white pawns' attacks
-        if (side == white && (movegen::pawn_attacks[black][square] & bitboards[P]))
+        if (side == white && (movegen::get_pawn_attacks(black, square) & bitboards[P]))
             return 1;
-        if (side == black && (movegen::pawn_attacks[white][square] & bitboards[p]))
+        if (side == black && (movegen::get_pawn_attacks(white, square) & bitboards[p]))
             return 1;
-        if (movegen::knight_attacks[square] & ((side == white) ? bitboards[N] : bitboards[n]))
+        if (movegen::get_knight_attacks(square) & ((side == white) ? bitboards[N] : bitboards[n]))
             return 1;
-        if (movegen::king_attacks[square] & ((side == white) ? bitboards[K] : bitboards[k]))
+        if (movegen::get_king_attacks(square) & ((side == white) ? bitboards[K] : bitboards[k]))
             return 1;
 
         // Sliders rely on current occupancy
@@ -93,38 +102,32 @@ namespace board
         return 0;
     }
 
-    // generate all moves
+    // Used to generate all possible moves
     static inline void generate_moves(moves *move_list)
     {
-        // init move count
+        // Reset move count
         move_list->size = 0;
 
-        // define source & target squares
+        // Define source & target squares
         int source_square, target_square;
 
-        // define current piece's bitboard copy & it's attacks
+        // Define current piece's bitboard copy and its attacks
         U64 bitboard, attacks;
 
-        // generate white pawns & white king castling moves
+        // Generate white pawns & white king castling moves
         if (side == white)
         {
-            // pick up white pawn bitboards index
-            // init piece bitboard copy
             bitboard = bitboards[P];
 
-            // loop over white pawns within white pawn bitboard
             while (bitboard)
             {
-                // init source square
                 source_square = movegen::get_ls1b(bitboard);
-
-                // init target square
                 target_square = source_square - 8;
 
-                // generate quiet pawn moves
-                if (!(target_square < a8) && !get_bit(occupancies[both], target_square))
+                // Generate quiet pawn moves
+                if (!get_bit(occupancies[both], target_square))
                 {
-                    // pawn promotion
+                    // Pawn promotion
                     if (source_square >= a7 && source_square <= h7)
                     {
                         add_move(move_list, encode_move(source_square, target_square, P, Q, 0, 0, 0, 0));
@@ -135,25 +138,23 @@ namespace board
 
                     else
                     {
-                        // one square ahead pawn move
+                        // One square ahead pawn move
                         add_move(move_list, encode_move(source_square, target_square, P, 0, 0, 0, 0, 0));
 
-                        // two squares ahead pawn move
+                        // Two squares ahead pawn move
                         if ((source_square >= a2 && source_square <= h2) && !get_bit(occupancies[both], target_square - 8))
                             add_move(move_list, encode_move(source_square, target_square - 8, P, 0, 0, 1, 0, 0));
                     }
                 }
 
-                // init pawn attacks bitboard
-                attacks = movegen::pawn_attacks[side][source_square] & occupancies[black];
+                // Init pawn attacks bitboard
+                attacks = movegen::get_pawn_attacks(side, source_square) & occupancies[black];
 
-                // generate pawn captures
                 while (attacks)
                 {
-                    // init target square
                     target_square = movegen::get_ls1b(attacks);
 
-                    // pawn promotion
+                    // Pawn promotion
                     if (source_square >= a7 && source_square <= h7)
                     {
                         add_move(move_list, encode_move(source_square, target_square, P, Q, 1, 0, 0, 0));
@@ -163,29 +164,28 @@ namespace board
                     }
 
                     else
-                        // one square ahead pawn move
                         add_move(move_list, encode_move(source_square, target_square, P, 0, 1, 0, 0, 0));
 
-                    // pop ls1b of the pawn attacks
+                    // Pop ls1b of the pawn attacks
                     pop_bit(attacks, target_square);
                 }
 
-                // generate en_passant captures
+                // Generate en_passant captures
                 if (en_passant != no_sq)
                 {
-                    // lookup pawn attacks and bitwise AND with en_passant square (bit)
-                    U64 en_passant_attacks = movegen::pawn_attacks[side][source_square] & (1ULL << en_passant);
+                    // Lookup pawn attacks and bitwise AND with en_passant square (bit)
+                    U64 en_passant_attacks = movegen::get_pawn_attacks(side, source_square) & (1ULL << en_passant);
 
-                    // make sure en_passant capture available
+                    // Make sure en_passant capture is available
                     if (en_passant_attacks)
                     {
-                        // init en_passant capture target square
+                        // Init en_passant capture target square
                         int target_en_passant = movegen::get_ls1b(en_passant_attacks);
                         add_move(move_list, encode_move(source_square, target_en_passant, P, 0, 1, 0, 1, 0));
                     }
                 }
 
-                // pop ls1b from piece bitboard copy
+                // Pop ls1b from piece bitboard copy
                 pop_bit(bitboard, source_square);
             }
 
@@ -232,7 +232,7 @@ namespace board
                 target_square = source_square + 8;
 
                 // generate quiet pawn moves
-                if (!(target_square > h1) && !get_bit(occupancies[both], target_square))
+                if (!get_bit(occupancies[both], target_square))
                 {
                     // pawn promotion
                     if (source_square >= a2 && source_square <= h2)
@@ -255,7 +255,7 @@ namespace board
                 }
 
                 // init pawn attacks bitboard
-                attacks = movegen::pawn_attacks[side][source_square] & occupancies[white];
+                attacks = movegen::get_pawn_attacks(side, source_square) & occupancies[white];
 
                 // generate pawn captures
                 while (attacks)
@@ -284,7 +284,7 @@ namespace board
                 if (en_passant != no_sq)
                 {
                     // lookup pawn attacks and bitwise AND with en_passant square (bit)
-                    U64 en_passant_attacks = movegen::pawn_attacks[side][source_square] & (1ULL << en_passant);
+                    U64 en_passant_attacks = movegen::get_pawn_attacks(side, source_square) & (1ULL << en_passant);
 
                     // make sure en_passant capture available
                     if (en_passant_attacks)
@@ -336,7 +336,7 @@ namespace board
             source_square = movegen::get_ls1b(bitboard);
 
             // init piece attacks in order to get set of target squares
-            attacks = movegen::knight_attacks[source_square] & ((side == white) ? ~occupancies[white] : ~occupancies[black]);
+            attacks = movegen::get_knight_attacks(source_square) & ((side == white) ? ~occupancies[white] : ~occupancies[black]);
 
             // loop over target squares available from generated attacks
             while (attacks)
@@ -473,7 +473,7 @@ namespace board
             source_square = movegen::get_ls1b(bitboard);
 
             // init piece attacks in order to get set of target squares
-            attacks = movegen::king_attacks[source_square] & ((side == white) ? ~occupancies[white] : ~occupancies[black]);
+            attacks = movegen::get_king_attacks(source_square) & ((side == white) ? ~occupancies[white] : ~occupancies[black]);
 
             // loop over target squares available from generated attacks
             while (attacks)
@@ -498,6 +498,7 @@ namespace board
         }
     }
 
+    // Used to make a move on the board
     static inline int make_move(int move, bool only_captures = false)
     {
         if (only_captures)
@@ -512,7 +513,7 @@ namespace board
 
         else
         {
-            // reset the en passant square
+            // Reset the en passant square
             en_passant = no_sq;
 
             copy_board();
@@ -521,16 +522,13 @@ namespace board
             int target = get_target(move);
             int piece = get_piece(move);
             int promotion_piece = get_promotion_piece(move);
-            int capture = is_capture(move);
-            int double_pawn_push = is_double_pawn_push(move);
-            int en_pass = is_en_passant(move);
-            int castling = is_castling(move);
 
-            // move piece
+            // Move piece
             pop_bit(bitboards[piece], source);
             set_bit(bitboards[promotion_piece ? promotion_piece : piece], target);
 
-            if (en_pass)
+            // If the move is en passant, remove the en passant-ed piece
+            if (is_en_passant(move))
             {
                 if (side == white)
                 {
@@ -542,9 +540,9 @@ namespace board
                 }
             }
 
-            // if move is a capture, remove the attacked piece
-            // important else, which saves running time
-            else if (capture)
+            // If move is a capture, remove the attacked piece
+            // Important else, which saves running time
+            else if (is_capture(move))
             {
                 int start_piece, end_piece;
                 if (side == white)
@@ -570,64 +568,61 @@ namespace board
                 }
             }
 
-            // set en passant square if a double pawn push was made
-            // else is used to save time
-            else if (double_pawn_push)
+            // Set en passant square if a double pawn push was made
+            // Else is used to save time
+            else if (is_double_pawn_push(move))
             {
                 side == white ? en_passant = target + 8 : en_passant = target - 8;
             }
 
-            else if (castling)
+            else if (is_castling(move))
             {
                 switch (target)
                 {
                 case g1:
-                    // if king side
+                    // If king side
                     pop_bit(bitboards[R], h1);
                     set_bit(bitboards[R], f1);
                     break;
 
                 case c1:
-                    // if queen side
+                    // If queen side
                     pop_bit(bitboards[R], a1);
                     set_bit(bitboards[R], d1);
                     break;
 
                 case g8:
-                    // if king side
+                    // If king side
                     pop_bit(bitboards[r], h8);
                     set_bit(bitboards[r], f8);
                     break;
 
                 case c8:
-                    // if queen side
+                    // If queen side
                     pop_bit(bitboards[r], a8);
                     set_bit(bitboards[r], d8);
                     break;
                 }
             }
 
-            // update castling rights
+            // Update castling rights
             castle &= movegen::castling_rights[source];
             castle &= movegen::castling_rights[target];
 
-            // update occupancies
+            // Update occupancies
             update_occupancies();
 
-            // check that the king is not in check
+            // Check that the king is not in check
             if (is_square_attacked((side == white) ? movegen::get_ls1b(bitboards[K]) : movegen::get_ls1b(bitboards[k]), side ^ 1))
             {
+                // If it is, revert back and return illegal move
                 revert_board();
-                // return illegal move
                 return 0;
             }
 
-            // switch sides
+            // Otherwise, switch sides and return legal move
             side ^= 1;
-
-            // return LEGAL move
             return 1;
         }
     }
-
 };
