@@ -5,13 +5,23 @@
 #include "uci.h"
 #include "utils.h"
 
+
 int main()
 {
+    bool debugging = true;
 
-    movegen::init();
-    uci::init();
-    
+    if (debugging)
+    {
+        board::parse_fen(rook_position);
+        cout << board::eval();
+        print::game();
+    }
 
-    
+    else
+    {
+
+        movegen::init();
+        uci::init();
+    }
     return 0;
 }

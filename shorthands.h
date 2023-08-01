@@ -87,3 +87,18 @@ struct moves
         (double_pawn_push << 21) |                                                                    \
         (en_passant << 22) |                                                                          \
         (castling << 23)
+
+extern const int P_score[64];
+extern const int N_score[64];
+extern const int B_score[64];
+extern const int R_score[64];
+extern const int Q_score[64];
+extern const int K_score[64];
+extern const int p_score[64];
+extern const int n_score[64];
+extern const int b_score[64];
+extern const int r_score[64];
+extern const int q_score[64];
+extern const int k_score[64];
+
+extern const int* piece_score[64];

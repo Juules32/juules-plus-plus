@@ -618,4 +618,26 @@ namespace board
             return 1;
         }
     }
+
+    static inline int eval()
+    {
+        U64 bitboard_copy;
+        int square; 
+        int score = 0;
+
+        // White pieces
+        for (int piece_type = P; piece_type <= k; piece_type++)
+        {
+            bitboard_copy = bitboards[piece_type];
+
+            while (bitboard_copy)
+            {
+                square = movegen::get_ls1b(bitboard_copy);
+                pop_bit(bitboard_copy, square);
+                score += piece_score[piece_type][square];
+            }
+        }
+
+        return score;
+    }
 };
