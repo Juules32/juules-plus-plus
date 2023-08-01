@@ -1,50 +1,98 @@
 #include "uci.h"
 #include "board.h"
 #include "utils.h"
+#include "perft.h"
 #include <sstream>
 #include <vector>
 
 void uci::init()
 {
+    uci::print_engine_info();
     uci::loop();
+}
+
+void uci::print_engine_info() {
+    cout << "id name ChessPlusPlus" << endl;
+    cout << "id author Juules32" << endl;
+    cout << "uciok\n" << endl;
 }
 
 void uci::loop()
 {
     string input;
-
     while (true)
     {
         getline(cin, input);
 
-        if (input == "quit" || input == "exit" || input == "stop")
+        if (input == "quit" || input == "exit")
         {
             break; // Exit the loop if the user enters "quit"
         }
-        int position_i = input.find("position");
-        int startpos_i = input.find("startpos");
-        int moves_i = input.find("moves");
 
-        if (position_i != string::npos)
-        {
-            // Get position
-            if (startpos_i != string::npos)
-            {
-                board::parse_fen(start_position);
-            }
-            else if (input.find("/") != string::npos)
-            {
-                board::parse_fen(input.substr(9));
-            }
-
-            // Make moves if specified
-            if (moves_i != string::npos)
-            {
-                uci::parse_moves(input.substr(moves_i + 6));
-            }
-
-            print::game();
+        else if (input == "uci") {
+            uci::print_engine_info();
         }
+
+        else if (input == "isready") {
+            cout << "readyok" << endl;
+        }
+
+        else if (input == "ucinewgame") {
+            uci::parse_position("position startpos");
+        }
+
+        uci::parse_position(input);
+        uci::parse_go(input);
+    }
+}
+
+int uci::parse_position(string input)
+{
+    int position_i = input.find("position");
+
+    if (position_i != string::npos)
+    {
+        int startpos_i = input.find("startpos");
+        int fen_i = input.find("fen");
+        int moves_i = input.find("moves");
+        // Get position
+        if (startpos_i != string::npos)
+        {
+            board::parse_fen(start_position);
+        }
+        else if (fen_i != string::npos)
+        {
+            board::parse_fen(input.substr(fen_i + 4));
+        }
+
+        // Make moves if specified
+        if (moves_i != string::npos)
+        {
+            uci::parse_moves(input.substr(moves_i + 6));
+        }
+
+        print::game();
+    }
+}
+
+int uci::parse_go(string input) {
+    int go_i = input.find("go");
+
+    if (go_i != string::npos)
+    {
+        //demo
+        cout << "bestmove d2d4" << endl;
+        int depth_i = input.find("depth");
+        int perft_i = input.find("perft");
+
+        if (depth_i != string::npos) {
+            int depth = stoi(input.substr(depth_i + 6));
+        }
+        else if (perft_i != string::npos) {
+            // String to integer
+            perft::test(stoi(input.substr(perft_i + 6)));
+        }
+
     }
 }
 
@@ -60,10 +108,13 @@ int uci::parse_moves(string input)
     string substring;
 
     // Extracts substrings separated by space and stores them in the vector
-    while (ss >> substring) substrings.push_back(substring);
+    while (ss >> substring)
+        substrings.push_back(substring);
 
-    for (const string &str : substrings) {
-        if (uci::parse_move(str)) board::make_move(uci::parse_move(str));
+    for (const string &str : substrings)
+    {
+        if (uci::parse_move(str))
+            board::make_move(uci::parse_move(str));
     }
 }
 

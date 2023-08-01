@@ -7,7 +7,6 @@
 
 int main()
 {
-    cout << "\nInitializing ChessPlusPlus engine...\n\n";
 
     movegen::init();
     uci::init();

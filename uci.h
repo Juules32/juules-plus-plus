@@ -9,6 +9,9 @@
 namespace uci {
     void init();
     void loop();
-    int parse_move(string move_string);
+    int parse_position(string input);
     int parse_moves(string input);
+    int parse_move(string move_string);
+    int parse_go(string input);
+    void print_engine_info();
 }
