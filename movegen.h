@@ -1,19 +1,18 @@
 #pragma once
-#include "shorthands.h"
+#define U64 unsigned long long
 
 /*
     The movegen namespace contains useful functions and variables
     relating to the move generation proces
 */
-
 namespace movegen
 {
 
     // Initializing empty attack arrays for the different pieces (pawns is 2d to account for color)
     extern U64 pawn_attacks[2][64];
     extern U64 pawn_quiet_moves[2][64];
-    extern U64 knight_attacks[64];
-    extern U64 king_attacks[64];
+    extern U64 knight_moves[64];
+    extern U64 king_moves[64];
     extern U64 rook_masks[64];
     extern U64 bishop_masks[64];
     extern U64 rook_attacks[64][4096];
@@ -26,9 +25,6 @@ namespace movegen
     // Pre-generated magic numbers for slider move indexing
     extern const U64 rook_magic_numbers[64];
     extern const U64 bishop_magic_numbers[64];
-
-    // Castling rights update constants
-    extern const int castling_rights[64];
 
     void init();
 
@@ -50,7 +46,7 @@ namespace movegen
     // The bitboard returned consists of 1's until the first 1 in the given bitboard is found
     static inline int get_ls1b(U64 bitboard)
     {
-        return (bitboard ? count_bits((bitboard & -bitboard) - 1) : -1);
+        return (count_bits((bitboard & -bitboard) - 1));
     }
 
     // The following leaper piece attack functions simply return
@@ -60,14 +56,14 @@ namespace movegen
         return pawn_attacks[side][square];
     }
 
-    static inline U64 get_knight_attacks(int square)
+    static inline U64 get_knight_moves(int square)
     {
-        return knight_attacks[square];
+        return knight_moves[square];
     }
 
-    static inline U64 get_king_attacks(int square)
+    static inline U64 get_king_moves(int square)
     {
-        return king_attacks[square];
+        return king_moves[square];
     }
 
     // The following slider piece attack functions return

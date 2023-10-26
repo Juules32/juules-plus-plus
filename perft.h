@@ -4,7 +4,6 @@
 /*
     The perft namespace is used for performance testing
 */
-
 namespace perft {
 
     // Amount of reached nodes
@@ -24,17 +23,21 @@ namespace perft {
 
         for (int move_count = 0; move_count < move_list->size; move_count++)
         {
-            // Copies board for later retrieval
-            copy_board();
+            int current_move = move_list->array[move_count];
+        
 
+            // Preserve board state
+            copy_state(current_move);
+            
             // Makes move and skips if illegal
-            if(!board::make_move(move_list->array[move_count])) continue;
+            if(!board::make_move(current_move)) continue;
 
             // Recursively calls itself with current position
             driver(depth-1);
 
+
             // Retrieves the previous position
-            revert_board();
+            revert_state();
         }
     }
 

@@ -1,5 +1,6 @@
 #include "movegen.h"
-#include "rng.h"
+#include "shorthands.h"
+#include "utils.h"
 
 namespace movegen
 {
@@ -7,8 +8,8 @@ namespace movegen
     // Initializing empty attack arrays for the different pieces (pawns is 2d to account for color)
     U64 pawn_attacks[2][64];
     U64 pawn_quiet_moves[2][64];
-    U64 knight_attacks[64];
-    U64 king_attacks[64];
+    U64 knight_moves[64];
+    U64 king_moves[64];
     U64 rook_masks[64];
     U64 bishop_masks[64];
     U64 rook_attacks[64][4096];
@@ -184,17 +185,7 @@ namespace movegen
 
     */
 
-    // Castling rights update constants
-    const int castling_rights[64] = {
-        7, 15, 15, 15, 3, 15, 15, 11,
-        15, 15, 15, 15, 15, 15, 15, 15,
-        15, 15, 15, 15, 15, 15, 15, 15,
-        15, 15, 15, 15, 15, 15, 15, 15,
-        15, 15, 15, 15, 15, 15, 15, 15,
-        15, 15, 15, 15, 15, 15, 15, 15,
-        15, 15, 15, 15, 15, 15, 15, 15,
-        13, 15, 15, 15, 12, 15, 15, 14};
-
+    
     // The U64 values for bitmaps used to isolate specific files
     const U64 not_a = 18374403900871474942ULL;
     const U64 not_ab = 18229723555195321596ULL;
@@ -257,7 +248,7 @@ namespace movegen
     }
 
     // Returns a knight attack mask
-    U64 mask_knight_attacks(int square)
+    U64 mask_knight_moves(int square)
     {
         U64 attacks = 0ULL;
         U64 bitboard = 1ULL << square;
@@ -284,7 +275,7 @@ namespace movegen
     }
 
     // Returns a king attack mask
-    U64 mask_king_attacks(int square)
+    U64 mask_king_moves(int square)
     {
         U64 attacks = 0ULL;
         U64 bitboard = 1ULL << square;
@@ -449,13 +440,13 @@ namespace movegen
             pawn_quiet_moves[white][square] = mask_pawn_quiet_moves(white, square);
             pawn_attacks[black][square] = mask_pawn_attacks(black, square);
             pawn_quiet_moves[black][square] = mask_pawn_quiet_moves(black, square);
-            knight_attacks[square] = mask_knight_attacks(square);
-            king_attacks[square] = mask_king_attacks(square);
+            knight_moves[square] = mask_knight_moves(square);
+            king_moves[square] = mask_king_moves(square);
         }
     }
 
     // Initializes the different slider moves
-    void init_slider_attacks(bool bishop)
+    void init_slider_moves(bool bishop)
     {
         for (int square = 0; square < 64; square++)
         {
@@ -495,8 +486,8 @@ namespace movegen
     void init()
     {
         init_leaper_moves();
-        init_slider_attacks(bishop);
-        init_slider_attacks(rook);
+        init_slider_moves(bishop);
+        init_slider_moves(rook);
     }
 
     // Generates a valid magic number for a square and sliding piece type

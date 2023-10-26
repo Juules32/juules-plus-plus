@@ -1,12 +1,12 @@
 #include "perft.h"
-#include "shorthands.h"
+#include "utils.h"
 
 long perft::nodes = 0;
 
 void perft::test(int depth)
 {
 
-    printf("\n     Performance test\n\n");
+    cout << "\n     Performance test\n\n";
     
     // Create move list instance
     moves move_list[1];
@@ -15,16 +15,19 @@ void perft::test(int depth)
     board::generate_moves(move_list);
     
     // Init start time
-    auto startTime = chrono::high_resolution_clock::now();
-    
+    Timer timer;
+
     // Loop over generated moves
     for (int move_count = 0; move_count < move_list->size; move_count++)
     {   
+        int current_move = move_list->array[move_count];
+        
+
         // Preserve board state
-        copy_board();
+        copy_state(current_move);
         
         // make move
-        if (!board::make_move(move_list->array[move_count]))
+        if (!board::make_move(current_move))
             // skip to the next move
             continue;
         
@@ -38,19 +41,14 @@ void perft::test(int depth)
         long old_nodes = nodes - cummulative_nodes;
         
         // take back
-        revert_board();
+        revert_state();
+
         
-        // print move
-        printf("     move: %s%s%c  nodes: %ld\n", index_to_square[get_source(move_list->array[move_count])],
-                                                 index_to_square[get_target(move_list->array[move_count])],
-                                                 get_promotion_piece(move_list->array[move_count]) ? promoted_pieces[get_promotion_piece(move_list->array[move_count])] : ' ',
-                                                 old_nodes);
+        cout << "     move: " << format::move(current_move) << "  nodes: " << old_nodes << endl;
     }
     
     // print results
-    printf("\n    Depth: %d\n", depth);
-    printf("    Nodes: %ld\n", nodes);
-    auto endTime = chrono::high_resolution_clock::now();
-    cout << "     Time: " << chrono::duration_cast<chrono::milliseconds>(endTime- startTime).count() << endl;
+    cout << "\n    Depth: " << depth;
+    cout << "\n    Nodes: " << nodes;
+    cout << "\n     Time: " << timer.get_time_passed_millis() << " milliseconds" << endl;
 }
-
