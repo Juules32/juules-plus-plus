@@ -13,7 +13,34 @@ on:
       - v*
 
 jobs:
-  build:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install build essentials
+        run: |
+          sudo apt-get update
+          sudo apt-get install build-essential
+        shell: bash
+
+      - name: Build and Publish Executables (Linux)
+        run: |
+          make publish
+          mkdir release
+          mv JuulesPlusPlus release/
+          zip -r -j "JuulesPlusPlus-linux.zip" release/
+        working-directory: .
+
+      - name: Upload Release Artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            JuulesPlusPlus-linux.zip
+
+  build-windows:
     runs-on: windows-latest
 
     steps:
