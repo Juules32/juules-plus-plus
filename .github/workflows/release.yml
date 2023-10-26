@@ -2,10 +2,7 @@ name: Release Executables
 
 on:
   push:
-    branches:
-      - $default-branch
-    tags:
-      - v*
+
 
 jobs:
   build:
@@ -25,14 +22,6 @@ jobs:
           sudo apt-get install build-essential
         shell: bash
 
-      - name: Build and Publish Executables (Linux)
-        run: |
-          make publish
-          mkdir release
-          mv JuulesPlusPlus release/
-          zip -r -j "JuulesPlusPlus-$tag-linux-x64.zip" release/
-        working-directory: .
-
       - name: Build and Publish Executables (Windows)
         run: |
           make publish
@@ -41,9 +30,7 @@ jobs:
         shell: bash
 
       - name: Upload Release Artifacts
-        uses: actions/upload-artifact@v2
+        uses: softprops/action-gh-release@v1
         with:
-          name: Executables
-          path: |
-            JuulesPlusPlus-$tag-linux-x64.zip
+          files: |
             JuulesPlusPlus-$tag-windows-x64.zip
