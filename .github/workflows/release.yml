@@ -27,11 +27,11 @@ jobs:
         run: |
           make publish
           mv JuulesPlusPlus JuulesPlusPlus.exe
-          7z a "JuulesPlusPlus-$tag-windows-x64.zip" JuulesPlusPlus.exe
+          7z a "JuulesPlusPlus-windows-x64.zip" JuulesPlusPlus.exe
         shell: bash
 
       - name: Upload Release Artifacts
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            JuulesPlusPlus-${{ env.tag }}-windows-x64.zip
+            JuulesPlusPlus-windows-x64.zip
