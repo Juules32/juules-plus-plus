@@ -13,6 +13,15 @@ on:
       - v*
 
 jobs:
+
+  set-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get the tag name
+        id: tag
+        run: echo ::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}
+
   build-linux:
     runs-on: ubuntu-latest
 
@@ -25,10 +34,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install build-essential
         shell: bash
-
-      - name: Get the tag name
-        id: tag
-        run: echo ::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}
 
       - name: Build and Publish Executables (Linux)
         run: |
@@ -50,10 +55,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Get the tag name
-        id: tag
-        run: echo ::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}
 
       - name: Build and Publish Executables (Windows)
         run: |
