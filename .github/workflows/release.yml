@@ -31,14 +31,14 @@ jobs:
           make publish
           mkdir release
           mv JuulesPlusPlus release/
-          zip -r -j "JuulesPlusPlus-${GITHUB_REF#refs/tags/}-linux.zip" release/
+          zip -r -j "JuulesPlusPlus-${{ github.ref_name }}-linux.zip" release/
         working-directory: .
 
       - name: Upload Release Artifacts
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            JuulesPlusPlus-${GITHUB_REF#refs/tags/}-linux.zip
+            JuulesPlusPlus-${{ github.ref_name }}-linux.zip
 
   build-windows:
     runs-on: windows-latest
@@ -46,14 +46,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+    
       - name: Build and Publish Executables (Windows)
         run: |
           make publish
-          7z a "JuulesPlusPlus-${GITHUB_REF#refs/tags/}-windows-x64.zip" JuulesPlusPlus.exe
+          7z a "JuulesPlusPlus-${{ github.ref_name }}-windows-x64.zip" JuulesPlusPlus.exe
         shell: bash
 
       - name: Upload Release Artifacts
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            JuulesPlusPlus-${GITHUB_REF#refs/tags/}-windows-x64.zip
+            JuulesPlusPlus-${{ github.ref_name }}-windows-x64.zip
