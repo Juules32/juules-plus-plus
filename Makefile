@@ -7,7 +7,7 @@ CXXFLAGS_PUBLISH = -Ofast -static-libgcc -static-libstdc++
 # Source files and output name
 SRC_FILES := $(wildcard *.cpp)
 OUTPUT = JuulesPlusPlus
-OUTPUT_DIR := C:\\Users\\benja\\Documents\\Code\\lichess-bot\\engines
+OUTPUT_DIR := C:\\Users\\benja\\Code\\lichess-bot\\engines
 
 # Default target
 all: $(OUTPUT)
