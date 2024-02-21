@@ -1,6 +1,5 @@
 TODO.txt
 .vscode/
 .VSCodeCounter/
-JuulesPlusPlus.exe
-JuulesPlusPlus_debug.exe
-JuulesPlusPlus_optimized.exe
+bin/*
+!bin/.gitkeep

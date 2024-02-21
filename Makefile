@@ -5,9 +5,9 @@ CXXFLAGS_OPTIMIZED = -Ofast
 CXXFLAGS_PUBLISH = -Ofast -static-libgcc -static-libstdc++
 
 # Source files and output name
-SRC_FILES := $(wildcard *.cpp)
+SRC_FILES := $(wildcard src/*.cpp)
 OUTPUT = JuulesPlusPlus
-OUTPUT_DIR := C:\\Users\\benja\\Code\\lichess-bot\\engines
+OUTPUT_DIR := bin
 
 # Default target
 all: $(OUTPUT)
@@ -26,7 +26,7 @@ optimized: $(SRC_FILES)
 
 publish: $(SRC_FILES)
 	@echo Compiling published program...
-	$(CXX) $(CXXFLAGS_PUBLISH) -o $(OUTPUT) $(SRC_FILES)
+	$(CXX) $(CXXFLAGS_PUBLISH) -o $(OUTPUT_DIR)/$(OUTPUT) $(SRC_FILES)
 	@echo Done!
 
 dir: $(SRC_FILES)
@@ -36,4 +36,4 @@ dir: $(SRC_FILES)
 
 run: optimized
 	@echo Running program...
-	@./$(OUTPUT)_optimized
+	@src/$(OUTPUT)_optimized
