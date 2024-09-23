@@ -9,31 +9,25 @@ SRC_FILES := $(wildcard src/*.cpp)
 OUTPUT = JuulesPlusPlus
 OUTPUT_DIR := bin
 
-# Default target
-all: $(OUTPUT)
-
 # Compile the source files with debugging information
-debug: $(SRC_FILES)
+debug:
 	@echo Compiling debugging program...
-	$(CXX) $(CXXFLAGS_DEBUG) -o $(OUTPUT)_debug $(SRC_FILES)
+	$(CXX) $(CXXFLAGS_DEBUG) -o $(OUTPUT_DIR)/$(OUTPUT)_debug $(SRC_FILES)
 	@echo Done!
 
-# Compile the source files with optimization
-optimized: $(SRC_FILES)
+# Compile with optimizations
+optimized:
 	@echo Compiling optimized program...
-	$(CXX) $(CXXFLAGS_OPTIMIZED) -o $(OUTPUT)_optimized $(SRC_FILES)
+	$(CXX) $(CXXFLAGS_OPTIMIZED) -o $(OUTPUT_DIR)/$(OUTPUT)_optimized $(SRC_FILES)
 	@echo Done!
 
-publish: $(SRC_FILES)
+# Compile with optimizations and dependencies
+publish:
 	@echo Compiling published program...
 	$(CXX) $(CXXFLAGS_PUBLISH) -o $(OUTPUT_DIR)/$(OUTPUT) $(SRC_FILES)
 	@echo Done!
 
-dir: $(SRC_FILES)
-	@echo Compiling optimized program for lichess engine folder...
-	$(CXX) $(CXXFLAGS_PUBLISH) $(SRC_FILES) -o $(OUTPUT_DIR)/$(OUTPUT)
-	@echo Done!
-
+# Compile and run
 run: optimized
 	@echo Running program...
-	@src/$(OUTPUT)_optimized
+	@bin/$(OUTPUT)_optimized
