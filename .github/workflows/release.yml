@@ -26,7 +26,7 @@ jobs:
         run: |
           make publish
           cd bin
-          zip -r -j "JuulesPlusPlus-${{ github.ref_name }}-linux.zip" JuulesPlusPlus
+          zip -r -j "../JuulesPlusPlus-${{ github.ref_name }}-linux.zip" JuulesPlusPlus
         working-directory: .
 
       - name: Upload Release Artifacts
@@ -45,7 +45,7 @@ jobs:
         run: |
           make publish
           cd bin
-          7z a "JuulesPlusPlus-${{ github.ref_name }}-windows-x64.zip" JuulesPlusPlus.exe
+          7z a "../JuulesPlusPlus-${{ github.ref_name }}-windows-x64.zip" JuulesPlusPlus.exe
         shell: bash
 
       - name: Upload Release Artifacts
