@@ -5,6 +5,7 @@ long perft::nodes = 0;
 
 void perft::test(int depth)
 {
+    perft::nodes = 0;
 
     cout << "\n     Performance test\n\n";
     
