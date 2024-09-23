@@ -366,4 +366,4 @@ static int pv_table[246][246];
 static const int reduced_depth_factor = 2;
 
 static int ply = 0;
-static long nodes = 0;
+static std::uint64_t nodes = 0;

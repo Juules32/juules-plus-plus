@@ -7,7 +7,7 @@
 namespace perft {
 
     // Amount of reached nodes
-    extern long nodes;
+    extern std::uint64_t nodes;
 
     // Recursive function to test how many possible positions exist
     static inline void driver(int depth) {
