@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install build essentials
         run: |
@@ -25,9 +25,7 @@ jobs:
       - name: Build and Publish Executables (Linux)
         run: |
           make publish
-          mkdir release
-          mv JuulesPlusPlus release/
-          zip -r -j "JuulesPlusPlus-${{ github.ref_name }}-linux.zip" release/
+          zip -r -j "JuulesPlusPlus-${{ github.ref_name }}-linux.zip" bin/
         working-directory: .
 
       - name: Upload Release Artifacts
@@ -40,12 +38,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
     
       - name: Build and Publish Executables (Windows)
         run: |
           make publish
-          7z a "JuulesPlusPlus-${{ github.ref_name }}-windows-x64.zip" JuulesPlusPlus.exe
+          7z a "JuulesPlusPlus-${{ github.ref_name }}-windows-x64.zip" bin/JuulesPlusPlus.exe
         shell: bash
 
       - name: Upload Release Artifacts
