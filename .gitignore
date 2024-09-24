@@ -3,3 +3,4 @@ TODO.txt
 .VSCodeCounter/
 bin/*
 !bin/.gitkeep
+*.exe

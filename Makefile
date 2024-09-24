@@ -5,7 +5,7 @@ CXXFLAGS_OPTIMIZED = -Ofast
 CXXFLAGS_PUBLISH = -Ofast -static-libgcc -static-libstdc++
 
 # Source files and output name
-SRC_FILES := $(wildcard src/*.cpp)
+SRC_FILES := src/main.cpp
 OUTPUT = JuulesPlusPlus
 OUTPUT_DIR := bin
 
