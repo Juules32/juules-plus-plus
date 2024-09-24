@@ -1,3 +1,15 @@
+/*
+
+I know what you're thinking - one big file, really?
+
+Yes. I've found it to be simpler this way;
+
+- Faster compilation times
+
+- No annoying header files with decentralized code
+
+*/
+
 #include <sstream>
 #include <vector>
 #include <map>
