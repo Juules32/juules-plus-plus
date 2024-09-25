@@ -1785,7 +1785,8 @@ namespace move_exec {
     // Evaluates the board state
     static inline int eval() {
         U64 bitboard_copy;
-        int square, score;
+        int square;
+        int score = 0;
 
         for (int piece_type = P; piece_type <= k; piece_type++) {
             bitboard_copy = state::bitboards[piece_type];
