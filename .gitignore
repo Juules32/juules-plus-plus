@@ -4,5 +4,5 @@ TODO.*
 bin/*
 !bin/.gitkeep
 *.exe
-juules_plus_plus.js
-juules_plus_plus.wasm
+JuulesPlusPlus.js
+JuulesPlusPlus.wasm
