@@ -25,9 +25,8 @@ jobs:
       - name: Build and Publish Executables (Linux)
         run: |
           make publish
-          cd bin
           zip -r -j "../JuulesPlusPlus-${{ github.ref_name }}-linux.zip" JuulesPlusPlus
-        working-directory: .
+        working-directory: bin
 
       - name: Upload Release Artifacts
         uses: softprops/action-gh-release@v2
@@ -70,11 +69,10 @@ jobs:
             -s WASM=1 \
             -s TOTAL_STACK=512mb
 
-      - name: Build and Publish Executables (Linux)
+      - name: Zip WebAssembly Files
         run: |
-          make publish
-          zip -r -j "JuulesPlusPlus-${{ github.ref_name }}-webassembly.zip" JuulesPlusPlus.js JuulesPlusPlus.wasm
-        working-directory: .
+          zip -r -j "../JuulesPlusPlus-${{ github.ref_name }}-webassembly.zip" JuulesPlusPlus.js JuulesPlusPlus.wasm
+        working-directory: web
 
       - name: Upload Release Artifacts
         uses: softprops/action-gh-release@v2
