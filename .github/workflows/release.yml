@@ -52,3 +52,31 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: JuulesPlusPlus-${{ github.ref_name }}-windows-x64.zip
+
+  build-webassembly:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: mymindstorm/setup-emsdk@v14
+
+      - name: Build WebAssembly
+        run: |
+          emcc -O3 src/web_build.cpp -o web/JuulesPlusPlus.js \
+            -s EXPORTED_FUNCTIONS=_test,_setup,_print_game,_make_move,_find_move \
+            -s EXPORTED_RUNTIME_METHODS=ccall,cwrap,UTF8ToString \
+            -s MODULARIZE=1 \
+            -s WASM=1 \
+            -s TOTAL_STACK=512mb
+
+      - name: Build and Publish Executables (Linux)
+        run: |
+          make publish
+          zip -r -j "JuulesPlusPlus-${{ github.ref_name }}-webassembly.zip" JuulesPlusPlus.js JuulesPlusPlus.wasm
+        working-directory: .
+
+      - name: Upload Release Artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: JuulesPlusPlus-${{ github.ref_name }}-webassembly.zip
