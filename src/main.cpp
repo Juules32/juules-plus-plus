@@ -1989,6 +1989,7 @@ namespace move_exec {
     // Function that binds everything together and looks for the best move, up to some depth
     // Takes into account time, killer moves, history moves, and the principle variation, for efficiency 
     void search_position(int depth) {
+        move_exec::timer.reset();
         stop_calculating = false;
 
         // Resets helper arrays
@@ -2483,8 +2484,6 @@ namespace uci {
             if (binc_i != std::string::npos && state::side == black) {
                 inc = stoi(input.substr(binc_i + 5));
             }
-
-            move_exec::timer.reset();
 
             if (time != -1) {
                 move_exec::use_time = true;
