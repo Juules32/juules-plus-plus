@@ -22,13 +22,14 @@ jobs:
           sudo apt-get install build-essential
         shell: bash
 
-      - name: Build and Publish Executables (Linux)
+      - name: Build and zip executable (Linux)
         run: |
           make publish
+          cd bin
           zip -r -j "../JuulesPlusPlus-${{ github.ref_name }}-linux.zip" JuulesPlusPlus
-        working-directory: bin
+        working-directory: .
 
-      - name: Upload Release Artifacts
+      - name: Upload Release
         uses: softprops/action-gh-release@v2
         with:
           files: JuulesPlusPlus-${{ github.ref_name }}-linux.zip
@@ -40,27 +41,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
     
-      - name: Build and Publish Executables (Windows)
+      - name: Build and zip executable (Windows)
         run: |
           make publish
           cd bin
           7z a "../JuulesPlusPlus-${{ github.ref_name }}-windows-x64.zip" JuulesPlusPlus.exe
         shell: bash
 
-      - name: Upload Release Artifacts
+      - name: Upload Release
         uses: softprops/action-gh-release@v2
         with:
           files: JuulesPlusPlus-${{ github.ref_name }}-windows-x64.zip
 
   build-webassembly:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - uses: mymindstorm/setup-emsdk@v14
-
-      - name: Build WebAssembly
+      - name: Build and zip WebAssembly
         run: |
           emcc -O3 src/web_build.cpp -o web/JuulesPlusPlus.js \
             -s EXPORTED_FUNCTIONS=_test,_setup,_print_game,_make_move,_find_move \
@@ -68,12 +69,9 @@ jobs:
             -s MODULARIZE=1 \
             -s WASM=1 \
             -s TOTAL_STACK=512mb
-
-      - name: Zip WebAssembly Files
-        run: |
+          cd web
           zip -r -j "../JuulesPlusPlus-${{ github.ref_name }}-webassembly.zip" JuulesPlusPlus.js JuulesPlusPlus.wasm
-        working-directory: web
-
+          
       - name: Upload Release Artifacts
         uses: softprops/action-gh-release@v2
         with:
