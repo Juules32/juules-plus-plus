@@ -6,3 +6,4 @@ bin/*
 *.exe
 JuulesPlusPlus.js
 JuulesPlusPlus.wasm
+tailwind.config.js

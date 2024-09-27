@@ -145,11 +145,11 @@ std::map<char, int> promoted_pieces = {
 
 // Predefined FEN strings
 std::string start_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-std::string pawns_position = "8/pppppppp/8/8/8/8/PPPPPPPP/8 w KQkq - 0 1 ";
-std::string tricky_position = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1 ";
+std::string pawns_position = "8/pppppppp/8/8/8/8/PPPPPPPP/8 w KQkq - 0 1";
+std::string tricky_position = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1";
 std::string killer_position = "rnbqkb1r/pp1p1pPp/8/2p1pP2/1P1P4/3P3P/P1P1P3/RNBQKBNR w KQkq e6 0 1";
 std::string cmk_position = "r2q1rk1/ppp2ppp/2n1bn2/2b1p3/3pP3/3P1NPP/PPP1NPB1/R1BQ1RK1 b - -";
-std::string rook_position = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ";
+std::string rook_position = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -";
 std::string promotion_position = "4k3/1P4P1/8/8/8/8/1pp3p1/4K3 w - - 0 1";
 std::string checkmate_position = "rnbqkbnr/ppppp2p/8/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1";
 std::string empty_position = "8/k7/8/8/8/8/K7/8 w - - ";
@@ -341,30 +341,6 @@ public:
 };
 
 /*
-    The format namespace contains functions related to formatting.
-*/
-namespace format {
-    std::string eval(int eval) {
-        double divided_score = static_cast<double>(eval) / 100.0;
-        std::string formatted_score = std::to_string(divided_score);
-        size_t dotPosition = formatted_score.find('.');
-        
-        // Ensure there are exactly two decimal places
-        if (dotPosition != std::string::npos && dotPosition + 3 < formatted_score.length()) {
-            formatted_score = formatted_score.substr(0, dotPosition + 3);
-        }
-        
-        return formatted_score;
-    }
-
-    std::string move(int move) {
-        return index_to_square[get_source(move)] +
-            index_to_square[get_target(move)] + 
-            char(promoted_pieces[get_promotion_piece_type(move)]);
-    }
-}
-
-/*
     The rng namespace contains functions related to random number generation.
 */
 namespace rng {
@@ -439,6 +415,99 @@ namespace state {
 
     // Castling rights
     int castle = 0;
+}
+
+/*
+    The format namespace contains functions related to formatting.
+*/
+namespace format {
+    std::string eval(int eval) {
+        double divided_score = static_cast<double>(eval) / 100.0;
+        std::string formatted_score = std::to_string(divided_score);
+        size_t dotPosition = formatted_score.find('.');
+        
+        // Ensure there are exactly two decimal places
+        if (dotPosition != std::string::npos && dotPosition + 3 < formatted_score.length()) {
+            formatted_score = formatted_score.substr(0, dotPosition + 3);
+        }
+        
+        return formatted_score;
+    }
+
+    std::string move(int move) {
+        return index_to_square[get_source(move)] +
+            index_to_square[get_target(move)] + 
+            char(promoted_pieces[get_promotion_piece_type(move)]);
+    }
+
+    std::string game_fen() {
+        std::string fen_string = "";
+        for (size_t i = 0; i < 8; i++) {
+            int num_empty_squares = 0;
+            for (size_t j = 0; j < 8; j++) {
+                int square = i * 8 + j;
+                int found_piece = no_piece;
+                for (size_t piece_type = P; piece_type <= k; piece_type++) {
+                    if (get_bit(state::bitboards[piece_type], square)) {
+                        found_piece = piece_type;
+                        break;
+                    }
+                }
+                if (found_piece != no_piece) {
+                    if (num_empty_squares != 0) {
+                        fen_string += std::to_string(num_empty_squares);
+                        num_empty_squares = 0;
+                    }
+                    fen_string += ascii_pieces[found_piece];
+                }
+                else {
+                    num_empty_squares++;
+                }
+            }
+            if (num_empty_squares != 0) {
+                fen_string += std::to_string(num_empty_squares);
+            }
+            if (i != 7) {
+                fen_string += "/";
+            }
+        }
+
+        // Side
+        fen_string += " " + std::string(state::side == white ? "w" : "b");
+
+        // Castling rights
+        fen_string += " ";
+        if (state::castle) {
+            if (state::castle & wk) {
+                fen_string += "K";
+            }
+            if (state::castle & wq) {
+                fen_string += "Q";
+            }
+            if (state::castle & bk) {
+                fen_string += "k";
+            }
+            if (state::castle & bq) {
+                fen_string += "q";
+            }
+        }
+        else {
+            fen_string += "-";
+        }
+
+        // En passant
+        fen_string += " ";
+        if (state::en_passant != no_sq) {
+            fen_string += index_to_square[state::en_passant];
+        }
+        else {
+            fen_string += "-";
+        }
+
+        // Note: Halfmove clock and Fullmove counter are not implemented!
+
+        return fen_string;
+    }
 }
 
 /*
@@ -2224,13 +2293,14 @@ namespace print {
         }
 
         cout << "\n     a b c d e f g h\n\n";
-        cout << "     Side:        " << (state::side == white ? "white" : "black") << endl;
-        cout << "     en_passant:  " << ((state::en_passant != no_sq) ? index_to_square[state::en_passant] : "no") << endl;
-        cout << "     Castling:    " << ((state::castle & wk) ? 'K' : '-') <<
-                                        ((state::castle & wq) ? 'Q' : '-') <<
-                                        ((state::castle & bk) ? 'k' : '-') <<
-                                        ((state::castle & bq) ? 'q' : '-') <<
-                                        endl;
+        cout << "     FEN:        " << format::game_fen() << endl;
+        cout << "     Side:       " << (state::side == white ? "white" : "black") << endl;
+        cout << "     en_passant: " << ((state::en_passant != no_sq) ? index_to_square[state::en_passant] : "no") << endl;
+        cout << "     Castling:   " << ((state::castle & wk) ? 'K' : '-') <<
+                                       ((state::castle & wq) ? 'Q' : '-') <<
+                                       ((state::castle & bk) ? 'k' : '-') <<
+                                       ((state::castle & bq) ? 'q' : '-') <<
+                                       endl;
     }
 }
 

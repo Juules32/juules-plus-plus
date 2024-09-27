@@ -4,44 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chess Engine in WebAssembly</title>
-    <script src="JuulesPlusPlus.js"></script> <!-- Load the WebAssembly module -->
+    <script src="JuulesPlusPlus.js"></script>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
     <h1>Chess Engine</h1>
-    <pre id="board"></pre> <!-- Display the current board position -->
     <input type="text" id="move" placeholder="Enter move (e.g., e2e4)" />
-    <button onclick="play_move()">Make Move</button>
-    <button onclick="opponent_move()">Opponent Move</button>
-
-    <script>
-        let engineModule, test, setup, print_game, make_move, find_move;
-
-        // Load the WebAssembly module
-        Module().then(Module => {
-            engineModule = Module;
-            test = engineModule.cwrap('test', 'string', ['string'])
-            test('Testing testing function')
-
-            setup = engineModule.cwrap('setup', null, null)
-            print_game = engineModule.cwrap('print_game', null, null)
-            make_move = engineModule.cwrap('make_move', 'number', ['string'])
-            find_move = engineModule.cwrap('find_move', null, null)
-
-            setup()
-
-            print_game()
-        });
-
-        function play_move() {
-            const move = document.getElementById('move').value
-            console.log(move)
-            console.log(make_move(move))
-        }
-
-        function opponent_move() {
-            find_move()
-        }
-
-    </script>
+    <button onclick="playMove()">Make Move</button>
+    <button onclick="engineMove()">Opponent Move</button>
+    <div class="flex justify-center">
+        <canvas width="800" height="800" id="board"></canvas>
+    </div>
+    <script src="engineModule.js"></script>
 </body>
 </html>
