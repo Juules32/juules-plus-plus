@@ -63,12 +63,7 @@ jobs:
       - uses: mymindstorm/setup-emsdk@v14
       - name: Build and zip WebAssembly
         run: |
-          emcc -O3 src/web_build.cpp -o web/JuulesPlusPlus.js \
-            -s EXPORTED_FUNCTIONS=_test,_setup,_print_game,_make_move,_find_move \
-            -s EXPORTED_RUNTIME_METHODS=ccall,cwrap,UTF8ToString \
-            -s MODULARIZE=1 \
-            -s WASM=1 \
-            -s TOTAL_STACK=512mb
+          make webassembly
           cd web
           zip -r -j "../JuulesPlusPlus-${{ github.ref_name }}-webassembly.zip" JuulesPlusPlus.js JuulesPlusPlus.wasm
           
