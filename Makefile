@@ -34,10 +34,10 @@ run: optimized
 
 webassembly:
 	@echo Compiling to WebAssembly...
-	emcc -O3 src/web_build.cpp -o web/JuulesPlusPlus.js 										   \
-	-s EXPORTED_FUNCTIONS=_setup,_make_move,_engine_move,_valid_move,_valid_targets,_make_move_str \
-	-s EXPORTED_RUNTIME_METHODS=ccall,cwrap,UTF8ToString 										   \
-	-s MODULARIZE=1 																			   \
-	-s WASM=1 																					   \
-	-s WASM_BIGINT=1																			   \
+	emcc -O3 src/web_build.cpp -o web/JuulesPlusPlus.js 										   				 \
+	-s EXPORTED_FUNCTIONS=_setup,_make_move,_engine_move,_valid_move,_valid_targets,_make_move_str,_is_checkmate \
+	-s EXPORTED_RUNTIME_METHODS=ccall,cwrap,UTF8ToString 										   				 \
+	-s MODULARIZE=1 																			   				 \
+	-s WASM=1 																					   				 \
+	-s WASM_BIGINT=1																			   				 \
 	-s TOTAL_STACK=512mb

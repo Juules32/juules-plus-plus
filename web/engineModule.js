@@ -1,7 +1,7 @@
 /*
     Engine Module Setup
 */
-let setup, makeMoveStr, makeMove, engineMove, validTargets, validMove
+let setup, makeMoveStr, makeMove, engineMove, validTargets, validMove, isCheckmate
 
 async function initializeEngine() {
     const engineModule = await Module() // Wait for the WebAssembly module to load
@@ -12,6 +12,7 @@ async function initializeEngine() {
     engineMove = engineModule.cwrap('engine_move', 'string', ['number', 'number'])
     validMove = engineModule.cwrap('valid_move', 'number', ['number', 'number', 'number'])
     validTargets = engineModule.cwrap('valid_targets', 'number', ['number', 'number'])
+    isCheckmate = engineModule.cwrap('is_checkmate', 'number', null)
 }
 
 /*
@@ -89,15 +90,19 @@ let selectedPieceType = null
 
 let moving = false
 
+let gameOver = false
+
 let currentValidTargetsBitboard = 0
 let validTargetSquares = []
 
 function updateBoardState(fen) {
     parseFen(fen)
+    gameOver = isCheckmate() ? true : false
     redraw()
 }
 
 function setSide(side) {
+    gameOver = false
     playerSide = side
     whiteTime = startingTime
     blackTime = startingTime
@@ -277,6 +282,15 @@ function redraw() {
     if (selectedSquare != null) {
         drawTargets()
     }
+
+    if (gameOver) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)"
+        ctx.rect(0, 0, 800, 800)
+        ctx.fill()
+
+        ctx.fillStyle = "white"
+        ctx.fillText(`${sideToMove == white ? "Black" : "White"} won!`, 326, 360)
+    }
 }
 
 window.onload = () => {
@@ -289,6 +303,10 @@ window.onload = () => {
     Event Listeners
 */
 c.addEventListener('mousemove', e => {
+    if (gameOver) {
+        return
+    }
+
     hoveredFile = Math.floor(e.offsetX / 100)
     hoveredRank = Math.floor(e.offsetY / 100)
     hoveredSquare = hoveredRank * 8 + hoveredFile
@@ -297,6 +315,10 @@ c.addEventListener('mousemove', e => {
 })
 
 c.addEventListener('mousedown', e => {
+    if (gameOver) {
+        return
+    }
+
     if (boardState[hoveredFile][hoveredRank] != null) {
         moving = true
         selectedSquare = hoveredSquare
@@ -321,6 +343,10 @@ c.addEventListener('mousedown', e => {
 })
 
 c.addEventListener('mouseup', () => {
+    if (gameOver) {
+        return
+    }
+
     if (selectedSquare != null) {
         tryMakingMove()
     }

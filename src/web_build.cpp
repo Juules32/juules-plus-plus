@@ -72,3 +72,21 @@ extern "C" const char* make_move(int move) {
 extern "C" const char* make_move_str(const char* move_string) {
     return make_move(uci::parse_move(move_string));
 }
+
+extern "C" int is_checkmate() {
+    moves move_list[1];
+    move_gen::generate_moves(move_list);
+
+    copy_state();
+    
+    for (size_t i = 0; i < move_list->size; i++) {
+        int current_move = move_list->array[i];
+        if (move_exec::make_move(current_move)) {
+            revert_state();
+            return 0;
+        }
+        revert_state();
+    }
+
+    return 1;
+}
