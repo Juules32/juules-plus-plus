@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chess Engine in WebAssembly</title>
+    <title>JuulesPlusPlus</title>
     <script src="JuulesPlusPlus.js"></script>
     <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Chess Engine</h1>
-    <input type="text" id="move" placeholder="Enter move (e.g., e2e4)" />
-    <button onclick="playMove()">Make Move</button>
-    <button onclick="engineMove()">Opponent Move</button>
+    <button onclick="setSide(0)">Play as white</button>
+    <button onclick="setSide(1)">Play as black</button>
+    <button onclick="setSide(2)">Play as both sides</button>
     <div class="flex justify-center">
-        <canvas width="800" height="800" id="board"></canvas>
+        <canvas width="800" height="800" class="border-8 border-black" id="board"></canvas>
     </div>
     <script src="engineModule.js"></script>
 </body>

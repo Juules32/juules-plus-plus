@@ -1558,11 +1558,23 @@ namespace move_gen {
 }
 
 // Macros for copying and reversing the current board state
-#define copy_state(move) \
+#define copy_move(move) \
     int move_copy = (move | (state::castle << 24));
 
-#define revert_state() \
+#define undo_copied_move() \
     move_exec::undo_move(move_copy)
+
+#define copy_state()                                                                            \
+    U64 bitboards_copy[12], occupancies_copy[3];                                                \
+    int side_copy, en_passant_copy, castle_copy;                                                \
+    memcpy(bitboards_copy, state::bitboards, BITBOARDS_SIZE);                                   \
+    memcpy(occupancies_copy, state::occupancies, OCCUPANCIES_SIZE);                             \
+    side_copy = state::side, en_passant_copy = state::en_passant, castle_copy = state::castle;
+
+#define revert_state()                                                                          \
+    memcpy(state::bitboards, bitboards_copy, BITBOARDS_SIZE);                                   \
+    memcpy(state::occupancies, occupancies_copy, OCCUPANCIES_SIZE);                             \
+    state::side = side_copy, state::en_passant = en_passant_copy, state::castle = castle_copy;
 
 /*
     The move_exec namespace contains functions and algorithms to make moves on the board
@@ -1762,7 +1774,7 @@ namespace move_exec {
         int piece = get_piece(move);
         int promotion_piece_type = get_promotion_piece_type(move);
 
-        copy_state(move);
+        copy_move(move);
 
         // Move piece
         pop_bit(state::bitboards[piece], source);
@@ -1843,7 +1855,7 @@ namespace move_exec {
         // Check that the king is not in check
         if (move_gen::is_square_attacked((state::side == black) ? util::get_ls1b(state::bitboards[K]) : util::get_ls1b(state::bitboards[k]), state::side)) {
             // If it is, revert back and return illegal move
-            revert_state();
+            undo_copied_move();
             return 0;
         }
 
@@ -1897,7 +1909,7 @@ namespace move_exec {
         for (int i = 0; i < move_list->size; i++) {
             int current_move = move_list->array[i];
 
-            copy_state(current_move);
+            copy_move(current_move);
 
             ++ply;
 
@@ -1911,7 +1923,7 @@ namespace move_exec {
             int score = -quiescence(-beta, -alpha);
             --ply;
 
-            revert_state();
+            undo_copied_move();
 
             if (stop_calculating) {
                 return 0;
@@ -1985,7 +1997,7 @@ namespace move_exec {
         for (int i = 0; i < move_list->size; i++) {
             int current_move = move_list->array[i];
 
-            copy_state(current_move);
+            copy_move(current_move);
 
             ++ply;
 
@@ -2001,7 +2013,7 @@ namespace move_exec {
             int score = -negamax(-beta, -alpha, depth - 1);
             --ply;
 
-            revert_state();
+            undo_copied_move();
 
             if (stop_calculating) {
                 return 0;
@@ -2071,11 +2083,7 @@ namespace move_exec {
         int beta = 50000;
         int candidate_pv_table_copy[246][246];
         
-        U64 bitboards_copy[12], occupancies_copy[3];                              
-        int side_copy, en_passant_copy, castle_copy;                              
-        memcpy(bitboards_copy, state::bitboards, BITBOARDS_SIZE);       
-        memcpy(occupancies_copy, state::occupancies, OCCUPANCIES_SIZE); 
-        side_copy = state::side, en_passant_copy = state::en_passant, castle_copy = state::castle;
+        copy_state();
 
         for (int current_depth = 1; current_depth <= depth; current_depth++) {
             if (stop_calculating) break;
@@ -2096,9 +2104,7 @@ namespace move_exec {
                 int current_eval = quiescence(alpha, beta);
                 cout << "Evaluation: " << format::eval(current_eval) << endl;
 
-                memcpy(state::bitboards, bitboards_copy, BITBOARDS_SIZE);       
-                memcpy(state::occupancies, occupancies_copy, OCCUPANCIES_SIZE); 
-                state::side = side_copy, state::en_passant = en_passant_copy, state::castle = castle_copy;
+                revert_state();
             }
             else {
                 cout << "Interrupted by time at depth " << current_depth << " looking through " << nodes << " nodes" << endl;
@@ -2325,7 +2331,7 @@ namespace perft {
             int current_move = move_list->array[move_count];
 
             // Preserve board state
-            copy_state(current_move);
+            copy_move(current_move);
             
             // Makes move and skips if illegal
             if (!move_exec::make_move(current_move)) continue;
@@ -2334,7 +2340,7 @@ namespace perft {
             driver(depth-1);
 
             // Retrieves the previous position
-            revert_state();
+            undo_copied_move();
         }
     }
 
@@ -2352,7 +2358,7 @@ namespace perft {
         for (int move_count = 0; move_count < move_list->size; move_count++) {
             int current_move = move_list->array[move_count];
 
-            copy_state(current_move);
+            copy_move(current_move);
             
             if (!move_exec::make_move(current_move)) continue;
             
@@ -2362,7 +2368,7 @@ namespace perft {
             
             long old_nodes = nodes - cumulative_nodes;
             
-            revert_state();
+            undo_copied_move();
             
             cout << "     move: " << format::move(current_move) << "  nodes: " << old_nodes << endl;
         }
