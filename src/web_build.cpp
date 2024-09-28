@@ -10,10 +10,14 @@ extern "C" void print_game() {
     print::game();
 }
 
-extern "C" const char* engine_move() {
-    move_exec::search_position(6);
-    int move = move_exec::pv_table[0][0];
+extern "C" const char* engine_move(int time, int inc) {
+    move_exec::use_time = true;
+    move_exec::stop_time = time / move_exec::moves_to_go - move_exec::time_offset + inc;
+    move_exec::search_position(64);
+
+    int move = move_exec::candidate_pv_table[0][0];
     move_exec::make_move(move);
+    
     print_game();
     return format::game_fen().c_str();
 }
@@ -35,7 +39,6 @@ extern "C" U64 valid_targets(int player_source, int player_side) {
             if (move_exec::make_move(current_move)) {
                 set_bit(result, get_target(current_move));
             }
-            print::bitboard(state::occupancies[both]);
             revert_state();
         }
     }

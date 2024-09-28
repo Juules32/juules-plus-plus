@@ -1585,6 +1585,7 @@ namespace move_exec {
     int history_moves[12][246];
     int pv_length[246];
     int pv_table[246][246];
+    int candidate_pv_table[246][246];
 
     // The current ply depth of calculation (ply means half-move)
     int ply = 0;
@@ -1602,6 +1603,8 @@ namespace move_exec {
     bool stop_calculating = false;
     bool use_time = false;
     double stop_time = std::numeric_limits<double>::infinity();
+    const int moves_to_go = 30;
+    const int time_offset = 100;
 
     static inline void check_if_time_is_up() {
         if (use_time && timer.get_time_passed_millis() > stop_time) {
@@ -2081,14 +2084,13 @@ namespace move_exec {
 
         int alpha = -50000;
         int beta = 50000;
-        int candidate_pv_table_copy[246][246];
         
         copy_state();
 
         for (int current_depth = 1; current_depth <= depth; current_depth++) {
             if (stop_calculating) break;
 
-            memcpy(&candidate_pv_table_copy, &pv_table, sizeof(pv_table));
+            memcpy(&candidate_pv_table, &pv_table, sizeof(pv_table));
 
             nodes = 0;
 
@@ -2117,10 +2119,10 @@ namespace move_exec {
         }
 
         if (!(stop_calculating)) {
-            memcpy(&candidate_pv_table_copy, &pv_table, sizeof(pv_table));
+            memcpy(&candidate_pv_table, &pv_table, sizeof(pv_table));
         }
 
-        cout << "\nbestmove " << format::move(candidate_pv_table_copy[0][0]) << "\n\n";
+        cout << "\nbestmove " << format::move(candidate_pv_table[0][0]) << "\n\n";
     }
 }
 
@@ -2532,7 +2534,6 @@ namespace uci {
             int depth = 6;
             int inc = -1;
             int time = -1;
-            int moves_to_go = 30;
             move_exec::use_time = false;
             move_exec::stop_time = std::numeric_limits<double>::infinity();
 
@@ -2566,7 +2567,7 @@ namespace uci {
 
                 // - 100 is a small offset to counteract the
                 // inevitable delay after stop_time is set to true
-                move_exec::stop_time = time / moves_to_go - 100 + inc;
+                move_exec::stop_time = time / move_exec::moves_to_go - move_exec::time_offset + inc;
 
                 move_exec::search_position(64);
             }

@@ -9,7 +9,7 @@ async function initializeEngine() {
     setup = engineModule.cwrap('setup', 'string', null)
     makeMoveStr = engineModule.cwrap('make_move_str', 'string', ['string'])
     makeMove = engineModule.cwrap('make_move', 'string', ['number'])
-    engineMove = engineModule.cwrap('engine_move', 'string', null)
+    engineMove = engineModule.cwrap('engine_move', 'string', ['number', 'number'])
     validMove = engineModule.cwrap('valid_move', 'number', ['number', 'number', 'number'])
     validTargets = engineModule.cwrap('valid_targets', 'number', ['number', 'number'])
 }
@@ -51,10 +51,24 @@ const rankNames = ["8", "7", "6", "5", "4", "3", "2", "1"]
 const white = 0
 const black = 1
 const both = 2
+const neither = 3
 
 /*
     State Management
 */
+const startingTime = 180000
+const increment = 0
+
+let whiteTime = startingTime
+let blackTime = startingTime
+
+let whiteLocalTime = startingTime
+let blackLocalTime = startingTime
+
+let lastWhiteTimestamp = performance.now()
+let lastBlackTimestamp = performance.now()
+
+let interval
 
 let playerSide = white
 let sideToMove = white
@@ -85,7 +99,55 @@ function updateBoardState(fen) {
 
 function setSide(side) {
     playerSide = side
+    whiteTime = startingTime
+    blackTime = startingTime
+    whiteLocalTime = startingTime
+    blackLocalTime = startingTime
+    clearInterval(interval)
+    lastWhiteTimestamp = performance.now()
+    lastBlackTimestamp = performance.now()
+    startClock()
     updateBoardState(setup())
+}
+
+
+const whiteClock = document.getElementById('whiteClock')
+const blackClock = document.getElementById('blackClock')
+
+function startClock() {
+    const updateFrequency = 33
+    interval = setInterval(() => {
+        if (sideToMove == white) {
+            whiteLocalTime -= updateFrequency
+        }
+        else {
+            blackLocalTime -= updateFrequency
+        }
+        updateClockDisplay()
+    }, updateFrequency)
+}
+
+function formatMilliseconds(ms) {
+    const minutes = Math.floor(ms / 60000); // Get whole minutes
+    const seconds = Math.floor((ms % 60000) / 1000); // Get whole seconds
+    const milliseconds = Math.floor((ms % 1000) / 10); // Get hundredths of a second
+
+    const formattedMinutes = minutes.toString().padStart(2, '0'); // Ensure minutes are two digits
+    const formattedSeconds = seconds.toString().padStart(2, '0'); // Ensure seconds are two digits
+    const formattedMilliseconds = milliseconds.toString().padStart(2, '0'); // Ensure seconds are two digits
+
+    if (minutes < 1) {
+        // If less than a minute, format with two decimal places for milliseconds
+        return `${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
+    } else {
+        // If 1 minute or more, show minutes:seconds
+        return `${formattedMinutes}:${formattedSeconds}`;
+    }
+}
+
+function updateClockDisplay() {
+    whiteClock.innerHTML = formatMilliseconds(whiteLocalTime)
+    blackClock.innerHTML = formatMilliseconds(blackLocalTime)
 }
 
 function setValidTargetSquares(bitboard) {
@@ -99,6 +161,20 @@ function setValidTargetSquares(bitboard) {
 }
 
 function parseFen(fen) {
+
+    const newTimestamp = performance.now()
+    if (sideToMove == white) {
+        whiteTime -= newTimestamp - lastWhiteTimestamp
+        whiteLocalTime = whiteTime
+    }
+    else {
+        blackTime -= newTimestamp - lastBlackTimestamp
+        blackLocalTime = blackTime
+    }
+    lastWhiteTimestamp = newTimestamp
+    lastBlackTimestamp = newTimestamp
+    updateClockDisplay()
+
     const parts = fen.trim().split(' ')
     const position = parts[0]
     sideToMove = parts[1] == "w" ? white : black
@@ -121,8 +197,13 @@ function parseFen(fen) {
         }
     }
 
+    if(playerSide == neither) {
+        requestAnimationFrame(() => updateBoardState(engineMove(sideToMove == white ? whiteTime : blackTime, 3)))
+        return
+    }
+
     if (playerSide != both && playerSide != sideToMove) {
-        updateBoardState(engineMove())
+        updateBoardState(engineMove(sideToMove == white ? whiteTime : blackTime, 3))
     }
 }
 
@@ -200,7 +281,7 @@ function redraw() {
 
 window.onload = () => {
     initializeEngine().then(() => {
-        updateBoardState(setup())
+        setSide(white)
     })
 }
 

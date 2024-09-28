@@ -5,14 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JuulesPlusPlus</title>
     <script src="JuulesPlusPlus.js"></script>
-    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <button onclick="setSide(0)">Play as white</button>
-    <button onclick="setSide(1)">Play as black</button>
-    <button onclick="setSide(2)">Play as both sides</button>
-    <div class="flex justify-center">
-        <canvas width="800" height="800" class="border-8 border-black" id="board"></canvas>
+    <div style="height: 100vh" class="flex justify-center items-center bg-slate-800">
+        <div style="height: 816px" class="flex justify-center border-8 border-black rounded-md text-2xl">
+            <canvas width="800" height="800" id="board"></canvas>
+            <div class="flex flex-col divide-y-2 divide-black justify-between border-l-8 border-black bg-[#4B7399] px-4">
+                <div id="blackClock" class="content-center h-full"></div>
+                <button onclick="setSide(white)" class="content-center text-left h-full">Play as White</button>
+                <button onclick="setSide(black)" class="content-center text-left h-full">Play as Black</button>
+                <button onclick="setSide(both)" class="content-center text-left h-full">Play Both Sides</button>
+                <button onclick="setSide(neither)" class="content-center text-left h-full">Engine Game</button>
+                <div id="whiteClock" class="content-center h-full"></div>
+            </div>
+        </div>
     </div>
     <script src="engineModule.js"></script>
 </body>
