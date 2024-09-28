@@ -1,13 +1,3 @@
-# Detect the operating system
-UNAME_S := 
-
-# Set the compiler and flags based on OS
-ifeq ($(shell uname -s),Linux)
-    EMCC = ./emcc
-else
-    EMCC = emcc
-endif
-
 # Compiler settings
 CXX = g++
 CXXFLAGS_DEBUG = -g -Wall -Wextra -pedantic
@@ -44,7 +34,7 @@ run: optimized
 
 webassembly:
 	@echo Compiling to WebAssembly...
-	$(EMCC) -O3 src/web_build.cpp -o web/JuulesPlusPlus.js 										   \
+	emcc -O3 src/web_build.cpp -o web/JuulesPlusPlus.js 										   \
 	-s EXPORTED_FUNCTIONS=_setup,_make_move,_engine_move,_valid_move,_valid_targets,_make_move_str \
 	-s EXPORTED_RUNTIME_METHODS=ccall,cwrap,UTF8ToString 										   \
 	-s MODULARIZE=1 																			   \
