@@ -243,7 +243,7 @@ function parseFen(fen) {
         }
     }
 
-    if(playerSide == neither || (playerSide != both && playerSide != sideToMove)) {
+    if(winner == neither && (playerSide == neither || (playerSide != both && playerSide != sideToMove))) {
         requestAnimationFrame(() => {
             const fen = engineMove(sideToMove == white ? whiteTime : blackTime, increment)
             moveSound.pause()
