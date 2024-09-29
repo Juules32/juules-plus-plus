@@ -46,6 +46,8 @@ pieceTypes.forEach(pieceType => {
 chessBoardImage = new Image()
 chessBoardImage.src = `https://images.chesscomfiles.com/chess-themes/boards/blue/100.png`
 
+moveSound = new Audio(`https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/move-self.mp3`)
+
 const fileNames = ["a", "b", "c", "d", "e", "f", "g", "h"]
 const rankNames = ["8", "7", "6", "5", "4", "3", "2", "1"]
 
@@ -96,9 +98,16 @@ let currentValidTargetsBitboard = 0
 let validTargetSquares = []
 
 function updateBoardState(fen) {
-    parseFen(fen)
-    gameOver = isCheckmate() ? true : false
-    redraw()
+    selectedSquare = null
+    selectedFile = null
+    selectedRank = null
+    selectedPieceType = null
+
+    requestAnimationFrame(() => {
+        parseFen(fen)
+        gameOver = isCheckmate() ? true : false
+        redraw()
+    })
 }
 
 function setSide(side) {
@@ -114,7 +123,6 @@ function setSide(side) {
     startClock()
     updateBoardState(setup())
 }
-
 
 const whiteClock = document.getElementById('whiteClock')
 const blackClock = document.getElementById('blackClock')
@@ -202,23 +210,23 @@ function parseFen(fen) {
         }
     }
 
-    if(playerSide == neither) {
-        requestAnimationFrame(() => updateBoardState(engineMove(sideToMove == white ? whiteTime : blackTime, 3)))
-        return
-    }
-
-    if (playerSide != both && playerSide != sideToMove) {
-        updateBoardState(engineMove(sideToMove == white ? whiteTime : blackTime, 3))
+    if(playerSide == neither || (playerSide != both && playerSide != sideToMove)) {
+        requestAnimationFrame(() => {
+            const fen = engineMove(sideToMove == white ? whiteTime : blackTime, increment)
+            moveSound.pause()
+            moveSound.currentTime = 0
+            moveSound.play()
+            updateBoardState(fen)
+        })
     }
 }
 
 function tryMakingMove() {
     const move = validMove(selectedSquare, hoveredSquare, playerSide)
     if (move) {
-        selectedSquare = null
-        selectedFile = null
-        selectedRank = null
-        selectedPieceType = null
+        boardState[selectedFile][selectedRank] = null
+        boardState[hoveredFile][hoveredRank] = selectedPieceType
+        moveSound.play()
         updateBoardState(makeMove(move))
     }
 }
