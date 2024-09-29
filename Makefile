@@ -1,3 +1,6 @@
+# Default flag value
+RUN_FLAGS ?=
+
 # Compiler settings
 CXX = g++
 CXXFLAGS_DEBUG = -g -Wall -Wextra -pedantic
@@ -30,7 +33,7 @@ publish:
 # Compile and run
 run: optimized
 	@echo Running program...
-	@bin/$(OUTPUT)_optimized
+	@bin/$(OUTPUT)_optimized $(RUN_FLAGS)
 
 webassembly:
 	@echo Compiling to WebAssembly...

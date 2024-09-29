@@ -361,7 +361,7 @@ namespace rng {
     }
 
     // Generates a random 64-bit number
-    unsigned int generate_64_bit() {
+    U64 generate_64_bit() {
 
         // Generates four different 32-bit numbers where the first 16 bits are 0
         U64 n1 = (U64)(generate_32_bit()) & 0xFFFF;
@@ -507,6 +507,48 @@ namespace format {
         // Note: Halfmove clock and Fullmove counter are not implemented!
 
         return fen_string;
+    }
+}
+
+/*
+    The flags namespace contains booleans for all command-line arguments
+*/
+namespace flags {
+    bool verbose = false; // -v
+    bool debug = false;   // -d
+
+    void show_help() {
+        cout << "Usage: JuulesPlusPlus [Options]"      << endl;
+        cout << "Options:"                             << endl;
+        cout << "    -d           Enable debug mode"      << endl;
+        cout << "    -v           Enable verbose mode"    << endl;
+        cout << "    -h           Show this help message" << endl;
+    }
+
+    void init(int argc, char* argv[]) {
+        for (int i = 1; i < argc; ++i) {
+            if (strcmp(argv[i], "-d") == 0) {
+                debug = true;
+            } 
+            else if (strcmp(argv[i], "-v") == 0) {
+                verbose = true;
+            }
+            else if (strcmp(argv[i], "-h") == 0) {
+                show_help();
+                exit(0);
+            }
+            else {
+                cout << "Unknown option: " << argv[i] << endl;
+                show_help();
+                exit(1);
+            }
+        }
+        if (debug) {
+            cout << "INFO: Running in debugging mode" << endl;
+        }
+        if (verbose) {
+            cout << "INFO: Running in verbose mode" << endl;
+        }
     }
 }
 
@@ -895,9 +937,8 @@ namespace move_gen {
     // Generates the appropriate bitboard from a permutation and attack_mask
     U64 set_occupancy(int permutation, int num_bits, U64 attack_mask) {
         U64 occupancy = 0ULL;
-        int square;
         for (int count = 0; count < num_bits; count++) {
-            square = util::get_ls1b(attack_mask);
+            int square = util::get_ls1b(attack_mask);
             pop_bit(attack_mask, square);
             if (permutation & (1 << count))
                 set_bit(occupancy, square);
@@ -983,7 +1024,6 @@ namespace move_gen {
 
         for (int random_count = 0; random_count < 100000000; random_count++) {
             U64 magic_number = generate_magic_number_contender();
-
             if (util::count_bits((attack_mask * magic_number) & 0xFF00000000000000) < 6) {
                 continue;
             }
@@ -2611,18 +2651,15 @@ namespace uci {
     }
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    flags::init(argc, argv);
     move_gen::init();
-
-    int debugging = 0;
-
-    if (debugging) {
-        // Various code can be tested here for debugging
+    if (flags::debug) {
+        // Put any debugging code here
+        move_gen::print_magic_numbers();
     }
-
     else {
         uci::init();
     }
-    
     return 0;
 }
