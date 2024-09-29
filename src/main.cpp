@@ -21,6 +21,7 @@ Yes. I've found it to be simpler this way;
 using std::cout;
 using std::cin;
 using std::endl;
+using std::string;
 
 // Custom type U64, consisting of 64 bits used for bitboards
 typedef unsigned long long U64;
@@ -103,7 +104,7 @@ struct moves {
     (castling << 30)
 
 // Lookup-tables relating converting from and to number and square name
-const std::string index_to_square[] = {
+const string index_to_square[] = {
     "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
     "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
     "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
@@ -114,7 +115,7 @@ const std::string index_to_square[] = {
     "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"};
 
 // ASCII pieces
-const std::string ascii_pieces[] = {"P", "N", "B", "R", "Q", "K", "p", "n", "b", "r", "q", "k"};
+const string ascii_pieces[] = {"P", "N", "B", "R", "Q", "K", "p", "n", "b", "r", "q", "k"};
 
 std::map<char, int> char_pieces = {
     {'P', P},
@@ -144,15 +145,15 @@ std::map<char, int> promoted_pieces = {
 };
 
 // Predefined FEN strings
-std::string start_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-std::string pawns_position = "8/pppppppp/8/8/8/8/PPPPPPPP/8 w KQkq - 0 1";
-std::string tricky_position = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1";
-std::string killer_position = "rnbqkb1r/pp1p1pPp/8/2p1pP2/1P1P4/3P3P/P1P1P3/RNBQKBNR w KQkq e6 0 1";
-std::string cmk_position = "r2q1rk1/ppp2ppp/2n1bn2/2b1p3/3pP3/3P1NPP/PPP1NPB1/R1BQ1RK1 b - -";
-std::string rook_position = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -";
-std::string promotion_position = "4k3/1P4P1/8/8/8/8/1pp3p1/4K3 w - - 0 1";
-std::string checkmate_position = "rnbqkbnr/ppppp2p/8/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1";
-std::string empty_position = "8/k7/8/8/8/8/K7/8 w - - ";
+string start_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+string pawns_position = "8/pppppppp/8/8/8/8/PPPPPPPP/8 w KQkq - 0 1";
+string tricky_position = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1";
+string killer_position = "rnbqkb1r/pp1p1pPp/8/2p1pP2/1P1P4/3P3P/P1P1P3/RNBQKBNR w KQkq e6 0 1";
+string cmk_position = "r2q1rk1/ppp2ppp/2n1bn2/2b1p3/3pP3/3P1NPP/PPP1NPB1/R1BQ1RK1 b - -";
+string rook_position = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -";
+string promotion_position = "4k3/1P4P1/8/8/8/8/1pp3p1/4K3 w - - 0 1";
+string checkmate_position = "rnbqkbnr/ppppp2p/8/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1";
+string empty_position = "8/k7/8/8/8/8/K7/8 w - - ";
 
 // Arrays for scoring piece placements
 const int P_score[64] = {
@@ -421,27 +422,27 @@ namespace state {
     The format namespace contains functions related to formatting.
 */
 namespace format {
-    std::string eval(int eval) {
+    string eval(int eval) {
         double divided_score = static_cast<double>(eval) / 100.0;
-        std::string formatted_score = std::to_string(divided_score);
+        string formatted_score = std::to_string(divided_score);
         size_t dotPosition = formatted_score.find('.');
         
         // Ensure there are exactly two decimal places
-        if (dotPosition != std::string::npos && dotPosition + 3 < formatted_score.length()) {
+        if (dotPosition != string::npos && dotPosition + 3 < formatted_score.length()) {
             formatted_score = formatted_score.substr(0, dotPosition + 3);
         }
         
         return formatted_score;
     }
 
-    std::string move(int move) {
+    string move(int move) {
         return index_to_square[get_source(move)] +
             index_to_square[get_target(move)] + 
             char(promoted_pieces[get_promotion_piece_type(move)]);
     }
 
-    std::string game_fen() {
-        std::string fen_string = "";
+    string game_fen() {
+        string fen_string = "";
         for (size_t i = 0; i < 8; i++) {
             int num_empty_squares = 0;
             for (size_t j = 0; j < 8; j++) {
@@ -473,7 +474,7 @@ namespace format {
         }
 
         // Side
-        fen_string += " " + std::string(state::side == white ? "w" : "b");
+        fen_string += " " + string(state::side == white ? "w" : "b");
 
         // Castling rights
         fen_string += " ";
@@ -1058,7 +1059,7 @@ namespace move_gen {
             printf(" 0x%llxUll,\n", find_magic_number(square, rook_relevant_bits[square], rook));
         }
 
-        cout << "\n\n";
+        cout << endl;
 
         for (int square = 0; square < 64; square++) {
             printf(" 0x%llxUll,\n", find_magic_number(square, bishop_relevant_bits[square], bishop));
@@ -2127,42 +2128,49 @@ namespace move_exec {
         
         copy_state();
 
-        for (int current_depth = 1; current_depth <= depth; current_depth++) {
-            if (stop_calculating) break;
+        cout << (flags::verbose ? "\n" : "");
 
+        for (int current_depth = 1; current_depth <= depth && !stop_calculating; current_depth++) {
             memcpy(&candidate_pv_table, &pv_table, sizeof(pv_table));
 
             nodes = 0;
 
             int score = move_exec::negamax(alpha, beta, current_depth);
-
-            cout << endl;
+            
             if (!stop_calculating) {
-                cout << "Found best move at depth " << current_depth << " looking through " << nodes << " nodes" << endl;
+                if (flags::verbose) {
+                    cout << "Found best move at depth " << current_depth << " looking through " << nodes << " nodes" << endl;
+                }
                 
                 for (int i = 0; i < pv_length[0]; i++) {
                     move_exec::make_move(pv_table[0][i]);
                 }
                 int current_eval = quiescence(alpha, beta);
-                cout << "Evaluation: " << format::eval(current_eval) << endl;
+
+                if (flags::verbose) {
+                    cout << "Evaluation: " << format::eval(current_eval) << endl;
+                }
 
                 revert_state();
             }
-            else {
-                cout << "Interrupted by time at depth " << current_depth << " looking through " << nodes << " nodes" << endl;
+            if (flags::verbose) {
+                if (stop_calculating) {
+                    cout << "Interrupted by time at depth " << current_depth << " looking through " << nodes << " nodes" << endl;
+                }
+                cout << "Total time passed: " << timer.get_time_passed_millis() << " milliseconds." << endl;
+                for (int i = 0; i < pv_length[0]; i++) {
+                    cout << format::move(pv_table[0][i]) << " ";
+                }
+                if (pv_length[0]) cout << endl;
+                cout << endl;
             }
-            cout << "Total time passed: " << timer.get_time_passed_millis() << " milliseconds." << endl;
-            for (int i = 0; i < pv_length[0]; i++) {
-                cout << format::move(pv_table[0][i]) << " ";
-            }
-            if (pv_length[0]) cout << endl;
         }
 
-        if (!(stop_calculating)) {
+        if (!stop_calculating) {
             memcpy(&candidate_pv_table, &pv_table, sizeof(pv_table));
         }
 
-        cout << "\nbestmove " << format::move(candidate_pv_table[0][0]) << "\n\n";
+        cout << "bestmove " << format::move(candidate_pv_table[0][0]) << endl << (flags::verbose ? "\n" : "");
     }
 }
 
@@ -2170,7 +2178,7 @@ namespace move_exec {
     The parse namespace so far only used to parse fen strings and set the board state.
 */
 namespace parse {
-    void fen(std::string fen) {
+    void fen(string fen) {
         memset(state::bitboards, 0ULL, BITBOARDS_SIZE);
 
         state::side = 0;
@@ -2318,7 +2326,7 @@ namespace print {
 
     void game() {
         int square;
-        cout << "\n";
+        cout << endl;
 
         for (int rank = 0; rank < 8; rank++) {
             for (int file = 0; file < 8; file++) {
@@ -2337,18 +2345,17 @@ namespace print {
                 }
                 cout << " " << (piece == -1 ? "." : ascii_pieces[piece]);
             }
-            cout << "\n";
+            cout << endl;
         }
 
         cout << "\n     a b c d e f g h\n\n";
-        cout << "     FEN:        " << format::game_fen() << endl;
-        cout << "     Side:       " << (state::side == white ? "white" : "black") << endl;
-        cout << "     en_passant: " << ((state::en_passant != no_sq) ? index_to_square[state::en_passant] : "no") << endl;
-        cout << "     Castling:   " << ((state::castle & wk) ? 'K' : '-') <<
-                                       ((state::castle & wq) ? 'Q' : '-') <<
-                                       ((state::castle & bk) ? 'k' : '-') <<
-                                       ((state::castle & bq) ? 'q' : '-') <<
-                                       endl;
+        cout <<   "     FEN:        " << format::game_fen() << endl;
+        cout <<   "     Side:       " << (state::side == white ? "white" : "black") << endl;
+        cout <<   "     en_passant: " << ((state::en_passant != no_sq) ? index_to_square[state::en_passant] : "no") << endl;
+        cout <<   "     Castling:   " << ((state::castle & wk) ? 'K' : '-') <<
+                                         ((state::castle & wq) ? 'Q' : '-') <<
+                                         ((state::castle & bk) ? 'k' : '-') <<
+                                         ((state::castle & bq) ? 'q' : '-') << "\n\n";
     }
 }
 
@@ -2425,7 +2432,7 @@ namespace perft {
     The uci namespace contains functions that implement the universal chess interface.
 */
 namespace uci {
-    int parse_move(std::string move_string) {
+    int parse_move(string move_string) {
         int source_square = move_string[0] - 'a' + (8 - (move_string[1] - '0')) * 8;
         int target_square = move_string[2] - 'a' + (8 - (move_string[3] - '0')) * 8;
 
@@ -2480,21 +2487,21 @@ namespace uci {
         return 0;
     }
     
-    void parse_moves(std::string input) {
+    void parse_moves(string input) {
         // Creates a stringstream from the input string
         std::stringstream ss(input);
 
         // Uses a vector to store the substrings
-        std::vector<std::string> substrings;
+        std::vector<string> substrings;
 
-        std::string substring;
+        string substring;
 
         // Extracts substrings separated by space and stores them in the vector
         while (ss >> substring) {
             substrings.push_back(substring);
         }
 
-        for (const std::string &str : substrings) {
+        for (const string &str : substrings) {
             if (parse_move(str))
                 move_exec::make_move(parse_move(str));
         }
@@ -2506,10 +2513,10 @@ namespace uci {
         cout << "uciok" << endl;
     }
 
-    void parse_position(std::string input) {
+    void parse_position(string input) {
         size_t position_i = input.find("position");
 
-        if (position_i != std::string::npos) {
+        if (position_i != string::npos) {
             size_t startpos_i = input.find("startpos");
             size_t trickypos_i = input.find("trickypos");
             size_t killerpos_i = input.find("killerpos");
@@ -2521,52 +2528,53 @@ namespace uci {
             size_t fen_i = input.find("fen");
             size_t moves_i = input.find("moves");
 
-            if (startpos_i != std::string::npos) {
+            if (startpos_i != string::npos) {
                 parse::fen(start_position);
             }
-            else if (trickypos_i != std::string::npos) {
+            else if (trickypos_i != string::npos) {
                 parse::fen(tricky_position);
             }
-            else if (killerpos_i != std::string::npos) {
+            else if (killerpos_i != string::npos) {
                 parse::fen(killer_position);
             }
-            else if (cmkpos_i != std::string::npos) {
+            else if (cmkpos_i != string::npos) {
                 parse::fen(cmk_position);
             }
-            else if (rookpos_i != std::string::npos) {
+            else if (rookpos_i != string::npos) {
                 parse::fen(rook_position);
             }
-            else if (promotionpos_i != std::string::npos) {
+            else if (promotionpos_i != string::npos) {
                 parse::fen(promotion_position);
             }
-            else if (checkmatepos_i != std::string::npos) {
+            else if (checkmatepos_i != string::npos) {
                 parse::fen(checkmate_position);
             }
-            else if (emptypos_i != std::string::npos) {
+            else if (emptypos_i != string::npos) {
                 parse::fen(empty_position);
             }
 
             // Parse and load fen is specified
-            else if (fen_i != std::string::npos) {
+            else if (fen_i != string::npos) {
                 parse::fen(input.substr(fen_i + 4));
             }
 
             // Make moves if specified
-            if (moves_i != std::string::npos) {
+            if (moves_i != string::npos) {
                 uci::parse_moves(input.substr(moves_i + 6));
             }
 
-            print::game();
+            if (flags::verbose) {
+                print::game();
+            }
         }
     }
 
-    void parse_go(std::string input) {
+    void parse_go(string input) {
         size_t go_i = input.find("go");
 
-        if (go_i != std::string::npos) {
+        if (go_i != string::npos) {
             size_t depth_i = input.find("depth");
             size_t perft_i = input.find("perft");
-            size_t eval_i = input.find("eval");
             size_t wtime_i = input.find("wtime");
             size_t btime_i = input.find("btime");
             size_t winc_i = input.find("winc");
@@ -2577,28 +2585,24 @@ namespace uci {
             move_exec::use_time = false;
             move_exec::stop_time = std::numeric_limits<double>::infinity();
 
-            if (depth_i != std::string::npos) {
+            if (depth_i != string::npos) {
                 depth = stoi(input.substr(depth_i + 6));
             }
-            else if (perft_i != std::string::npos) {
+            else if (perft_i != string::npos) {
                 perft::test(stoi(input.substr(perft_i + 6)));
                 return;
             }
-            else if (eval_i != std::string::npos) {
-                cout << move_exec::eval() << endl;
-                return;
-            }
 
-            if (wtime_i != std::string::npos && state::side == white) {
+            if (wtime_i != string::npos && state::side == white) {
                 time = stoi(input.substr(wtime_i + 6));
             }
-            if (btime_i != std::string::npos && state::side == black) {
+            if (btime_i != string::npos && state::side == black) {
                 time = stoi(input.substr(btime_i + 6));
             }
-            if (winc_i != std::string::npos && state::side == white) {
+            if (winc_i != string::npos && state::side == white) {
                 inc = stoi(input.substr(winc_i + 5));
             }
-            if (binc_i != std::string::npos && state::side == black) {
+            if (binc_i != string::npos && state::side == black) {
                 inc = stoi(input.substr(binc_i + 5));
             }
 
@@ -2620,7 +2624,7 @@ namespace uci {
 
     // Function that keeps the program running to take commands
     void loop() {
-        std::string input;
+        string input;
         while (true) {
             getline(cin, input);
             
@@ -2656,7 +2660,6 @@ int main(int argc, char* argv[]) {
     move_gen::init();
     if (flags::debug) {
         // Put any debugging code here
-        move_gen::print_magic_numbers();
     }
     else {
         uci::init();
