@@ -1,5 +1,5 @@
-# Default flag value
-RUN_FLAGS ?=
+# Default command-line flags
+CL_FLAGS ?=
 
 # Compiler settings
 CXX := g++
@@ -33,7 +33,7 @@ publish:
 # Compile and run
 run: optimized
 	@echo Running program...
-	@$(OUTPUT_DIR)/$(OUTPUT)_optimized $(RUN_FLAGS)
+	@$(OUTPUT_DIR)/$(OUTPUT)_optimized $(CL_FLAGS)
 
 webassembly:
 	@echo Compiling to WebAssembly...
