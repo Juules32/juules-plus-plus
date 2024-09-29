@@ -92,7 +92,7 @@ let selectedPieceType = null
 
 let moving = false
 
-let gameOver = false
+let winner = neither
 
 let currentValidTargetsBitboard = 0
 let validTargetSquares = []
@@ -105,13 +105,20 @@ function updateBoardState(fen) {
 
     requestAnimationFrame(() => {
         parseFen(fen)
-        gameOver = isCheckmate() ? true : false
+        if (isCheckmate()) {
+            if (sideToMove == white) {
+                winner = black
+            }
+            else {
+                winner = white
+            }
+        }
         redraw()
     })
 }
 
 function setSide(side) {
-    gameOver = false
+    winner = neither
     playerSide = side
     whiteTime = startingTime
     blackTime = startingTime
@@ -131,10 +138,36 @@ function startClock() {
     const updateFrequency = 33
     interval = setInterval(() => {
         if (sideToMove == white) {
-            whiteLocalTime -= updateFrequency
+            if (whiteLocalTime > 0) {
+                whiteLocalTime -= updateFrequency
+            }
+            else {
+                const newTimestamp = performance.now()
+                whiteTime -= newTimestamp - lastWhiteTimestamp
+                whiteLocalTime = whiteTime
+                lastWhiteTimestamp = newTimestamp
+                if (whiteTime <= 0) {
+                    whiteLocalTime = 0
+                    winner = black
+                    redraw()
+                }
+            }
         }
         else {
-            blackLocalTime -= updateFrequency
+            if (blackLocalTime > 0) {
+                blackLocalTime -= updateFrequency
+            }
+            else {
+                const newTimestamp = performance.now()
+                blackTime -= newTimestamp - lastBlackTimestamp
+                blackLocalTime = blackTime
+                lastBlackTimestamp = newTimestamp
+                if (blackTime <= 0) {
+                    blackLocalTime = 0
+                    winner = white
+                    redraw()
+                }
+            }
         }
         updateClockDisplay()
     }, updateFrequency)
@@ -291,13 +324,13 @@ function redraw() {
         drawTargets()
     }
 
-    if (gameOver) {
+    if (winner != neither) {
         ctx.fillStyle = "rgba(0, 0, 0, 0.5)"
         ctx.rect(0, 0, 800, 800)
         ctx.fill()
 
         ctx.fillStyle = "white"
-        ctx.fillText(`${sideToMove == white ? "Black" : "White"} won!`, 326, 360)
+        ctx.fillText(`${winner == white ? "White" : "Black"} won!`, 326, 360)
     }
 }
 
@@ -311,7 +344,7 @@ window.onload = () => {
     Event Listeners
 */
 c.addEventListener('mousemove', e => {
-    if (gameOver) {
+    if (winner != neither) {
         return
     }
 
@@ -323,7 +356,7 @@ c.addEventListener('mousemove', e => {
 })
 
 c.addEventListener('mousedown', e => {
-    if (gameOver) {
+    if (winner != neither) {
         return
     }
 
@@ -351,7 +384,7 @@ c.addEventListener('mousedown', e => {
 })
 
 c.addEventListener('mouseup', () => {
-    if (gameOver) {
+    if (winner != neither) {
         return
     }
 
