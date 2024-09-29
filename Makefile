@@ -2,14 +2,14 @@
 RUN_FLAGS ?=
 
 # Compiler settings
-CXX = g++
-CXXFLAGS_DEBUG = -g -Wall -Wextra -pedantic
-CXXFLAGS_OPTIMIZED = -Ofast
-CXXFLAGS_PUBLISH = -Ofast -static-libgcc -static-libstdc++
+CXX := g++
+CXXFLAGS_DEBUG := -g -Wall -Wextra -pedantic
+CXXFLAGS_OPTIMIZED := -Ofast
+CXXFLAGS_PUBLISH := -Ofast -static-libgcc -static-libstdc++
 
 # Source files and output name
 SRC_FILES := src/main.cpp
-OUTPUT = JuulesPlusPlus
+OUTPUT := JuulesPlusPlus
 OUTPUT_DIR := bin
 
 # Compile the source files with debugging information
@@ -33,7 +33,7 @@ publish:
 # Compile and run
 run: optimized
 	@echo Running program...
-	@bin/$(OUTPUT)_optimized $(RUN_FLAGS)
+	@$(OUTPUT_DIR)/$(OUTPUT)_optimized $(RUN_FLAGS)
 
 webassembly:
 	@echo Compiling to WebAssembly...
